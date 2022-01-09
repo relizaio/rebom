@@ -1,0 +1,33 @@
+{
+  "name": "rebom-backend",
+  "version": "0.1.0",
+  "description": "Reliza SBOM repository backend",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "test",
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/relizaio/rebom.git"
+  },
+  "keywords": [
+    "sbom",
+    "bom",
+    "repository"
+  ],
+  "author": "Reliza Incorporated",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/relizaio/rebom/issues"
+  },
+  "homepage": "https://github.com/relizaio/rebom#readme",
+  "dependencies": {
+    "apollo-server": "^3.6.1",
+    "graphql": "^16.2.0",
+    "typescript": "^4.5.4"
+  },
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.1"
+  }
+}
