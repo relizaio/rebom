@@ -1,4 +1,5 @@
-const { ApolloServer, gql } = require('apollo-server');
+const { ApolloServer, gql } = require('apollo-server')
+const utils = require('./utils')
 
 type GqlUrl = {
     url: string
@@ -8,7 +9,8 @@ type GqlUrl = {
 const typeDefs = gql`
   type Query {
     "A simple type for getting started!"
-    hello: String
+    hello: String,
+    dbtest: String
   }
 `;
 
@@ -16,6 +18,10 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     hello: () => 'world',
+    dbtest: () => {
+      utils.runQuery('select * from pg_catalog.pg_roles', [])
+      return 'done'
+    }
   },
 };
 
