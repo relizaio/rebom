@@ -14,19 +14,36 @@ type Bom = {
   tags: Object
 }
 
+type BomInput = {
+  bomInput: {
+    meta: string,
+    bom: Object,
+    tags: Object
+  }
+}
+
 // The GraphQL schema
 const typeDefs = gql`
   type Query {
-    "A simple type for getting started!"
-    hello: String,
+    hello: String
     dbtest: String
     allBoms: [Bom]
+  }
+
+  type Mutation {
+    addBom(bomInput: BomInput): Bom
   }
 
   type Bom {
     uuid: ID!
     created_date: DateTime
     last_updated_date: DateTime
+    meta: String
+    bom: Object
+    tags: Object
+  }
+
+  input BomInput {
     meta: String
     bom: Object
     tags: Object
@@ -47,10 +64,17 @@ const resolvers = {
     allBoms: async () => {
       let queryRes = await utils.runQuery('select * from rebom.boms', []) 
       let boms = queryRes.rows as Bom[]
-      console.log(boms)
       return boms
     }
   },
+  Mutation: {
+    addBom: async (parent : any, bomInput : BomInput): Promise<Bom> => {
+      console.log(bomInput)
+      let queryText = 'INSERT INTO rebom.boms (meta, bom, tags) VALUES ($1, $2, $3) RETURNING *'
+      let queryRes = await utils.runQuery(queryText, [bomInput.bomInput.meta, bomInput.bomInput.bom, bomInput.bomInput.tags])
+      return queryRes.rows[0]
+    }
+  }
 };
 
 const server = new ApolloServer({

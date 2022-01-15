@@ -16,8 +16,7 @@ export function getPool() {
 export async function runQuery (query: string, params: string[]) : Promise<any> {
     const client = await pool.connect()
     try {
-      const res = await client.query(query, params)
-      return res
+      return await client.query(query, params)
     } finally {
       // Make sure to release the client before any error handling,
       // just in case the error handling itself throws an error.
