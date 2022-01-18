@@ -22,12 +22,20 @@ type BomInput = {
   }
 }
 
+type BomSearch = {
+  bomSearch: {
+    serialNumber: string,
+    version: string
+  }
+}
+
 // The GraphQL schema
 const typeDefs = gql`
   type Query {
     hello: String
     dbtest: String
     allBoms: [Bom]
+    findBom(bomSearch: BomSearch): [Bom]
   }
 
   type Mutation {
@@ -49,6 +57,11 @@ const typeDefs = gql`
     tags: Object
   }
 
+  input BomSearch {
+    serialNumber: ID
+    version: String
+  }
+
   scalar Object
   scalar DateTime
 `;
@@ -57,19 +70,37 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     hello: () => 'world',
-    dbtest: () => {
-      utils.runQuery('select * from pg_catalog.pg_roles', [])
-      return 'done'
-    },
     allBoms: async () => {
       let queryRes = await utils.runQuery('select * from rebom.boms', []) 
       let boms = queryRes.rows as Bom[]
       return boms
+    },
+    findBom: async (parent: any, bomSearch : BomSearch) => {
+      let queryText = `select * from rebom.boms where 1 = 1`
+      let queryParams = []
+      let paramId = 1;
+
+      if (bomSearch.bomSearch.serialNumber) {
+        if (!bomSearch.bomSearch.serialNumber.startsWith('urn')) {
+          bomSearch.bomSearch.serialNumber = 'urn:uuid:' + bomSearch.bomSearch.serialNumber
+        }
+        queryText += `AND bom->>'serialNumber' = $${paramId}`
+        queryParams.push(bomSearch.bomSearch.serialNumber)
+        ++paramId
+      }
+
+      if (bomSearch.bomSearch.version) {
+        queryText += `AND bom->>'version' = $${paramId}`
+        queryParams.push(bomSearch.bomSearch.version)
+        ++paramId
+      }
+      
+      let queryRes = await utils.runQuery(queryText, queryParams)
+      return queryRes.rows
     }
   },
   Mutation: {
     addBom: async (parent : any, bomInput : BomInput): Promise<Bom> => {
-      console.log(bomInput)
       let queryText = 'INSERT INTO rebom.boms (meta, bom, tags) VALUES ($1, $2, $3) RETURNING *'
       let queryRes = await utils.runQuery(queryText, [bomInput.bomInput.meta, bomInput.bomInput.bom, bomInput.bomInput.tags])
       return queryRes.rows[0]
