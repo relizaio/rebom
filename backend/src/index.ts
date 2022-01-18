@@ -29,6 +29,12 @@ type BomSearch = {
   }
 }
 
+type SearchObject = {
+  queryText: string,
+  queryParams: string[],
+  paramId: number
+}
+
 // The GraphQL schema
 const typeDefs = gql`
   type Query {
@@ -76,26 +82,24 @@ const resolvers = {
       return boms
     },
     findBom: async (parent: any, bomSearch : BomSearch) => {
-      let queryText = `select * from rebom.boms where 1 = 1`
-      let queryParams = []
-      let paramId = 1;
+      let searchObject = {
+        queryText: `select * from rebom.boms where 1 = 1`,
+        queryParams: [],
+        paramId: 1
+      }
 
       if (bomSearch.bomSearch.serialNumber) {
         if (!bomSearch.bomSearch.serialNumber.startsWith('urn')) {
           bomSearch.bomSearch.serialNumber = 'urn:uuid:' + bomSearch.bomSearch.serialNumber
         }
-        queryText += `AND bom->>'serialNumber' = $${paramId}`
-        queryParams.push(bomSearch.bomSearch.serialNumber)
-        ++paramId
+        updateSearchObj(searchObject, `bom->>'serialNumber'`, bomSearch.bomSearch.serialNumber)
       }
 
       if (bomSearch.bomSearch.version) {
-        queryText += `AND bom->>'version' = $${paramId}`
-        queryParams.push(bomSearch.bomSearch.version)
-        ++paramId
+        updateSearchObj(searchObject, `bom->>'version'`, bomSearch.bomSearch.version)
       }
       
-      let queryRes = await utils.runQuery(queryText, queryParams)
+      let queryRes = await utils.runQuery(searchObject.queryText, searchObject.queryParams)
       return queryRes.rows
     }
   },
@@ -106,13 +110,19 @@ const resolvers = {
       return queryRes.rows[0]
     }
   }
-};
+}
+
+function updateSearchObj(searchObject: SearchObject, queryPath: string, addParam: string) {
+  searchObject.queryText += `AND ${queryPath} = $${searchObject.paramId}`
+  searchObject.queryParams.push(addParam)
+  ++searchObject.paramId
+}
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-});
+})
 
 server.listen().then(( gqlUrl: GqlUrl ) => {
-  console.log(`🚀 Server ready at ${gqlUrl.url}`);
-});
+  console.log(`🚀 Server ready at ${gqlUrl.url}`)
+})
