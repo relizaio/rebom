@@ -1,0 +1,261 @@
+{
+  "bomFormat" : "CycloneDX",
+  "specVersion" : "1.3",
+  "serialNumber" : "urn:uuid:1629ea83-eddf-46d4-8e08-1efa659057df",
+  "version" : 1,
+  "metadata" : {
+    "timestamp" : "2022-01-10T00:23:20Z",
+    "tools" : [
+      {
+        "vendor" : "CycloneDX",
+        "name" : "CycloneDX Maven plugin",
+        "version" : "2.5.3",
+        "hashes" : [
+          {
+            "alg" : "MD5",
+            "content" : "4f7d894200ad695fc9f0aad66d7da40a"
+          },
+          {
+            "alg" : "SHA-1",
+            "content" : "c044d9b726650cbea3adeb5cc1715c67d8356c0a"
+          },
+          {
+            "alg" : "SHA-256",
+            "content" : "b9a385e430e1f5efd9b835a084c195dde4d5e1bc79e469a8187ec58275c15313"
+          },
+          {
+            "alg" : "SHA-384",
+            "content" : "d96f68ef4b8830d70dc2eb5f2de5211d96b70dd1169da641f34474265c06a5321b63d2c80fe2d82d74c767391225e480"
+          },
+          {
+            "alg" : "SHA-512",
+            "content" : "1d7d1129cdc8604772b3c454d8dff98d936f85af705c95705e3263a038c0bb58fdd58c0b90efa3f56b4ce8ef9c84d3154b74b8451e0470f856f4d688489704b0"
+          },
+          {
+            "alg" : "SHA3-256",
+            "content" : "44231962fe0c1e5501ca38ad3320f9223ea5e8d62aa8aad170577818801ce349"
+          },
+          {
+            "alg" : "SHA3-384",
+            "content" : "99659ce3e58d8416f9e28d6b87c800442a79c4a5703fb657f6a9da87495d1d9d3b9788e06a3d6ea0e1b659a4681a4c92"
+          },
+          {
+            "alg" : "SHA3-512",
+            "content" : "8d5c3f0ee5a53cc714c4d829ccc07688f951a6b6655ad1e6435b8ab1c281bc38a78073b329bdaaf4887114b6843723ac8b5176a5f954581960a43662c688a95a"
+          }
+        ]
+      }
+    ],
+    "component" : {
+      "group" : "io.reliza",
+      "name" : "versioning",
+      "version" : "2021.10.4-SNAPSHOT",
+      "description" : "Reliza Versioning allows for automatic generation and bumping of CalVer or SemVer or custom version schemas.",
+      "licenses" : [
+        {
+          "license" : {
+            "id" : "MIT",
+            "url" : "https://opensource.org/licenses/MIT"
+          }
+        }
+      ],
+      "purl" : "pkg:maven/io.reliza/versioning@2021.10.4-SNAPSHOT?type=jar",
+      "externalReferences" : [
+        {
+          "type" : "distribution",
+          "url" : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+        },
+        {
+          "type" : "vcs",
+          "url" : "https://github.com/relizaio/versioning"
+        }
+      ],
+      "type" : "library",
+      "bom-ref" : "pkg:maven/io.reliza/versioning@2021.10.4-SNAPSHOT?type=jar",
+      "hashes" : [
+        {
+          "alg" : "SHA-256",
+          "content" : "9b59b02e796fd17075613ce477d87071a289532ea66aeb778970f4351ee46942"
+        },
+        {
+          "alg" : "SHA-512",
+          "content" : "e98b0487956dde65d915d3f8a70f6c82782f8cb06123b17587b67cedbf3e7e73fe6d18511df623197ab272a11d54889efa63b4ed2bd52ea9090daf3cd0113d54"
+        }
+    }
+  },
+  "components" : [
+    {
+      "publisher" : "The Apache Software Foundation",
+      "group" : "org.apache.commons",
+      "name" : "commons-lang3",
+      "version" : "3.9",
+      "description" : "Apache Commons Lang, a package of Java utility classes for the classes that are in java.lang's hierarchy, or are considered to be so standard as to justify existence in java.lang.",
+      "scope" : "optional",
+      "hashes" : [
+        {
+          "alg" : "MD5",
+          "content" : "fa752c3cb5474b05e14bf2ed7e242020"
+        },
+        {
+          "alg" : "SHA-1",
+          "content" : "0122c7cee69b53ed4a7681c03d4ee4c0e2765da5"
+        },
+        {
+          "alg" : "SHA-256",
+          "content" : "de2e1dcdcf3ef917a8ce858661a06726a9a944f28e33ad7f9e08bea44dc3c230"
+        },
+        {
+          "alg" : "SHA-384",
+          "content" : "6bee823962a2d92e9f5eae0d442e4ce5cd39ea1c2f89259e3aeb5ad94bb6321744955e6a412f9e1b9ad14b87a39a6512"
+        },
+        {
+          "alg" : "SHA-512",
+          "content" : "c6516ebaa0d83d3dfc421061a57d0f7eb30d0cf9ea05a0d5fa1c94b4d42bca211444ea9023de1a812533b88112be95cd5d9638e160afcb31c31d6570f95a9610"
+        },
+        {
+          "alg" : "SHA3-256",
+          "content" : "762c8d6c6f05ed7ee1dcaa30600e181f4c570726963fff43fab04a23795ec501"
+        },
+        {
+          "alg" : "SHA3-384",
+          "content" : "56c40427def27716d2e5c025ccb838512f902dbe17ff0812f34dca0e1c3db02b1fb48e903c23c830e2c24f9d32acae4e"
+        },
+        {
+          "alg" : "SHA3-512",
+          "content" : "2dd5b60623f76e9565151e0cc27846086d5f810b3f6323d473cebc1aaf87f529c6a834b94ebc3f09a9c23d3597c892fc08d8bcb9d0a491b8be9a047bacb59be8"
+        }
+      ],
+      "licenses" : [
+        {
+          "license" : {
+            "id" : "Apache-2.0"
+          }
+        }
+      ],
+      "purl" : "pkg:maven/org.apache.commons/commons-lang3@3.9?type=jar",
+      "externalReferences" : [
+        {
+          "type" : "issue-tracker",
+          "url" : "http://issues.apache.org/jira/browse/LANG"
+        },
+        {
+          "type" : "vcs",
+          "url" : "https://git-wip-us.apache.org/repos/asf?p=commons-lang.git"
+        },
+        {
+          "type" : "build-system",
+          "url" : "https://builds.apache.org/"
+        },
+        {
+          "type" : "mailing-list",
+          "url" : "https://mail-archives.apache.org/mod_mbox/commons-user/"
+        },
+        {
+          "type" : "website",
+          "url" : "https://www.apache.org/"
+        },
+        {
+          "type" : "distribution",
+          "url" : "https://repository.apache.org/service/local/staging/deploy/maven2"
+        }
+      ],
+      "type" : "library",
+      "bom-ref" : "pkg:maven/org.apache.commons/commons-lang3@3.9?type=jar"
+    },
+    {
+      "publisher" : "The Apache Software Foundation",
+      "group" : "commons-cli",
+      "name" : "commons-cli",
+      "version" : "1.4",
+      "description" : "Apache Commons CLI provides a simple API for presenting, processing and validating a command line interface.",
+      "scope" : "optional",
+      "hashes" : [
+        {
+          "alg" : "MD5",
+          "content" : "c966d7e03507c834d5b09b848560174e"
+        },
+        {
+          "alg" : "SHA-1",
+          "content" : "c51c00206bb913cd8612b24abd9fa98ae89719b1"
+        },
+        {
+          "alg" : "SHA-256",
+          "content" : "fd3c7c9545a9cdb2051d1f9155c4f76b1e4ac5a57304404a6eedb578ffba7328"
+        },
+        {
+          "alg" : "SHA-384",
+          "content" : "aa516a360ed41568a618c45df5288daa75c2d2ddb9a9af61324962f2cf534834bb0fb51bf13710709a771f09992febc5"
+        },
+        {
+          "alg" : "SHA-512",
+          "content" : "fa769a08a118141831cd4eaf2ce4f3f65855b8aeee86fbf3e07b4c619facf801f8b55c14c5e56a154cd14f438a8f120bb59a20c1b6be04979501e362f252ca48"
+        },
+        {
+          "alg" : "SHA3-256",
+          "content" : "ae001ddbe856dfe4395be480cd710615e6759ab122eee9fa909f6bb883b752d2"
+        },
+        {
+          "alg" : "SHA3-384",
+          "content" : "cff9bf72b706076f84b27e705c9f56c4f89ddeeb32672346ec37735534e006f631f0a1a9eecf883f475696376cceca91"
+        },
+        {
+          "alg" : "SHA3-512",
+          "content" : "f4659c0b58616c7f32f0a947b3d94ab5533ca4315e10f009fd2f6092e56942b5c8653f5a0eaef2e3908ffc43363f31fcb53686d1ac40f1b18c7bd305119c8037"
+        }
+      ],
+      "licenses" : [
+        {
+          "license" : {
+            "id" : "Apache-2.0"
+          }
+        }
+      ],
+      "purl" : "pkg:maven/commons-cli/commons-cli@1.4?type=jar",
+      "externalReferences" : [
+        {
+          "type" : "issue-tracker",
+          "url" : "http://issues.apache.org/jira/browse/CLI"
+        },
+        {
+          "type" : "vcs",
+          "url" : "http://svn.apache.org/viewvc/commons/proper/cli/trunk/"
+        },
+        {
+          "type" : "build-system",
+          "url" : "https://builds.apache.org/"
+        },
+        {
+          "type" : "mailing-list",
+          "url" : "http://mail-archives.apache.org/mod_mbox/commons-user/"
+        },
+        {
+          "type" : "website",
+          "url" : "https://www.apache.org/"
+        },
+        {
+          "type" : "distribution",
+          "url" : "https://repository.apache.org/service/local/staging/deploy/maven2"
+        }
+      ],
+      "type" : "library",
+      "bom-ref" : "pkg:maven/commons-cli/commons-cli@1.4?type=jar"
+    }
+  ],
+  "dependencies" : [
+    {
+      "ref" : "pkg:maven/io.reliza/versioning@2021.10.4-SNAPSHOT?type=jar",
+      "dependsOn" : [
+        "pkg:maven/org.apache.commons/commons-lang3@3.9?type=jar",
+        "pkg:maven/commons-cli/commons-cli@1.4?type=jar"
+      ]
+    },
+    {
+      "ref" : "pkg:maven/org.apache.commons/commons-lang3@3.9?type=jar",
+      "dependsOn" : [ ]
+    },
+    {
+      "ref" : "pkg:maven/commons-cli/commons-cli@1.4?type=jar",
+      "dependsOn" : [ ]
+    }
+  ]
+}
