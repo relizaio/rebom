@@ -25,7 +25,10 @@ type BomInput = {
 type BomSearch = {
   bomSearch: {
     serialNumber: string,
-    version: string
+    version: string,
+    componentVersion: string,
+    componentGroup: string,
+    componentName: string
   }
 }
 
@@ -66,6 +69,9 @@ const typeDefs = gql`
   input BomSearch {
     serialNumber: ID
     version: String
+    componentVersion: String
+    componentGroup: String
+    componentName: String
   }
 
   scalar Object
@@ -95,10 +101,17 @@ const resolvers = {
         updateSearchObj(searchObject, `bom->>'serialNumber'`, bomSearch.bomSearch.serialNumber)
       }
 
-      if (bomSearch.bomSearch.version) {
-        updateSearchObj(searchObject, `bom->>'version'`, bomSearch.bomSearch.version)
-      }
+      if (bomSearch.bomSearch.version) updateSearchObj(searchObject, `bom->>'version'`, bomSearch.bomSearch.version)
+
+      if (bomSearch.bomSearch.componentVersion) updateSearchObj(searchObject, `bom->'metadata'->'component'->>'version'`, 
+          bomSearch.bomSearch.componentVersion)
       
+      if (bomSearch.bomSearch.componentGroup) updateSearchObj(searchObject, `bom->'metadata'->'component'->>'group'`, 
+          bomSearch.bomSearch.componentGroup)
+      
+      if (bomSearch.bomSearch.componentName) updateSearchObj(searchObject, `bom->'metadata'->'component'->>'name'`, 
+          bomSearch.bomSearch.componentName)
+
       let queryRes = await utils.runQuery(searchObject.queryText, searchObject.queryParams)
       return queryRes.rows
     }
