@@ -1,4 +1,7 @@
-const { ApolloServer, gql } = require('apollo-server')
+import { ApolloServer, gql } from 'apollo-server-express'
+import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core'
+import express from 'express'
+import http from 'http'
 const utils = require('./utils')
 
 type GqlUrl = {
@@ -96,8 +99,6 @@ const resolvers = {
       return findBom(bomSearch)
     },
     bomById: async (parent: any, id: any): Promise<Object> => {
-      console.log('id is = ' + id)
-      console.log(id)
       let retObj = {}
       let byIdRows = await utils.runQuery(`select * from rebom.boms where uuid = $1`, [id.id])
       if (byIdRows && byIdRows.rows && byIdRows.rows[0]) {
@@ -187,11 +188,35 @@ function updateSearchObj(searchObject: SearchObject, queryPath: string, addParam
   ++searchObject.paramId
 }
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-})
+async function startApolloServer(typeDefs: any, resolvers: any) {
+  const app = express();
+  const httpServer = http.createServer(app);
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  });
+  await server.start();
+  server.applyMiddleware({ app });
 
-server.listen().then(( gqlUrl: GqlUrl ) => {
-  console.log(`🚀 Server ready at ${gqlUrl.url}`)
-})
+  app.get('/bomById/:uuid', async (req, res) => {
+      let bomId = req.params.uuid
+      try {
+          let retObj = {}
+          let byIdRows = await utils.runQuery(`select * from rebom.boms where uuid = $1`, [bomId])
+          if (byIdRows && byIdRows.rows && byIdRows.rows[0]) {
+              retObj = byIdRows.rows[0].bom
+          }
+          res.send(retObj)
+      } catch (error) {
+          console.error('Errored bom for id = ' + bomId)
+          res.statusCode = 404
+          res.send('Bom not found')
+      }
+  })
+
+  await new Promise<void>(resolve => httpServer.listen({ port: 4000 }, resolve));
+  console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
+}
+
+startApolloServer(typeDefs, resolvers)
