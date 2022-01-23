@@ -1,6 +1,13 @@
 <template>
   <div>
     Hello page {{ vTitle }}
+    <div>
+        <v-text-field
+        label="Main input"
+        hide-details="auto"
+        ></v-text-field>
+        <v-text-field label="Another input"></v-text-field>
+    </div>
   </div>
 </template>
 
