@@ -16,7 +16,7 @@
 import { ref } from 'vue'
 import { computed } from 'vue'
 import gql from 'graphql-tag'
-import graphqlClient from '../utils/graphql.js'
+import graphqlClient from '../utils/graphql.ts'
 
 export default {
     name: 'Home',
