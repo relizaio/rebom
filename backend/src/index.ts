@@ -47,6 +47,7 @@ const typeDefs = gql`
     dbtest: String
     allBoms: [Bom]
     findBom(bomSearch: BomSearch): [Bom]
+    bomById(id: ID): Object
   }
 
   type Mutation {
@@ -93,6 +94,16 @@ const resolvers = {
     },
     findBom: async (parent: any, bomSearch : BomSearch) => {
       return findBom(bomSearch)
+    },
+    bomById: async (parent: any, id: any): Promise<Object> => {
+      console.log('id is = ' + id)
+      console.log(id)
+      let retObj = {}
+      let byIdRows = await utils.runQuery(`select * from rebom.boms where uuid = $1`, [id.id])
+      if (byIdRows && byIdRows.rows && byIdRows.rows[0]) {
+        retObj = byIdRows.rows[0].bom
+      }
+      return retObj
     }
   },
   Mutation: {
