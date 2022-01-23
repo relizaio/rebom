@@ -12,31 +12,50 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { ref } from 'vue'
 import { computed } from 'vue'
 import gql from 'graphql-tag'
-import graphqlClient from '../utils/graphql.ts'
+import graphqlClient from '../utils/graphql'
 
 export default {
     name: 'Home',
     props: {
         msg: String
     },
-    async setup(props) {
+    async setup(props: any) {
         const vTitle = computed(() => '-' + props.msg + '-')
         const hello = await fetchHello()
+        let bomSearchObj : BomSearch = {
+            bomSearch: {
+                serialNumber: '',
+                version: '',
+                componentVersion: '',
+                componentGroup: '',
+                componentName: ''
+            }
+        }
+        const boms = await searchBom(bomSearchObj)
 
         const items = ref(['This', 'is'])
-        const itemsQuantity = computed(() => items.value.length)
 
         return {
+            boms,
             vTitle,
             items,
-            itemsQuantity,
             hello
         }
     }
+}
+
+type BomSearch = {
+  bomSearch: {
+    serialNumber: string,
+    version: string,
+    componentVersion: string,
+    componentGroup: string,
+    componentName: string
+  }
 }
 
 async function fetchHello() {
@@ -48,6 +67,21 @@ async function fetchHello() {
     })
     console.log(response.data)
     return response.data.hello
+}
+
+async function searchBom(bomSearch: BomSearch) {
+    const response = await graphqlClient.query({
+        query: gql`
+            query findBom ($bomSearch: BomSearch) {
+                findBom(bomSearch: $bomSearch) {
+                    uuid
+                    meta
+                }
+            }`,
+        variables: bomSearch
+    })
+    console.log(response.data)
+    return response.data.bomSearch
 }
 
 </script>
