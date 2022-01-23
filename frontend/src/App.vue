@@ -1,9 +1,12 @@
 <template>
-  <v-app>
-    <v-main>
-      <Home msg="abc"/>
-    </v-main>
-  </v-app>
+    <Suspense>
+        <template #default>
+            <Home msg="abc"/>
+        </template>
+        <template #fallback>
+            <div>Loading...</div>
+        </template>
+    </Suspense>
 </template>
 
 <script>

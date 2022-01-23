@@ -1,38 +1,55 @@
 <template>
-  <div>
-    Hello page {{ vTitle }}
     <div>
-        <v-text-field
-        label="Main input"
-        hide-details="auto"
-        ></v-text-field>
-        <v-text-field label="Another input"></v-text-field>
+        Hello page {{ vTitle }}
+        Fetched hello: {{ hello }}
+        <div>
+            <v-text-field
+            label="Main input"
+            hide-details="auto"
+            ></v-text-field>
+            <v-text-field label="Another input"></v-text-field>
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
 import { ref } from 'vue'
 import { computed } from 'vue'
+import gql from 'graphql-tag'
+import graphqlClient from '../utils/graphql.js'
 
 export default {
-  name: 'Home',
-  props: {
-    msg: String
-  },
-  setup(props) {
-    const vTitle = computed(() => '-' + props.msg + '-')
+    name: 'Home',
+    props: {
+        msg: String
+    },
+    async setup(props) {
+        const vTitle = computed(() => '-' + props.msg + '-')
+        const hello = await fetchHello()
 
-    const items = ref(['This', 'is'])
-    const itemsQuantity = computed(() => items.value.length)
+        const items = ref(['This', 'is'])
+        const itemsQuantity = computed(() => items.value.length)
 
-    return {
-      vTitle,
-      items,
-      itemsQuantity
+        return {
+            vTitle,
+            items,
+            itemsQuantity,
+            hello
+        }
     }
-  }
 }
+
+async function fetchHello() {
+    const response = await graphqlClient.query({
+        query: gql`
+            query {
+                hello
+            }`
+    })
+    console.log(response.data)
+    return response.data.hello
+}
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
