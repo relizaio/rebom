@@ -199,13 +199,16 @@ async function startApolloServer(typeDefs: any, resolvers: any) {
   await server.start();
   server.applyMiddleware({ app });
 
-  app.get('/bomById/:uuid', async (req, res) => {
+  app.get('/restapi/bomById/:uuid', async (req, res) => {
       let bomId = req.params.uuid
       try {
           let retObj = {}
           let byIdRows = await utils.runQuery(`select * from rebom.boms where uuid = $1`, [bomId])
           if (byIdRows && byIdRows.rows && byIdRows.rows[0]) {
               retObj = byIdRows.rows[0].bom
+          }
+          if (req.query.download) {
+            res.type('application/octet-stream')
           }
           res.send(retObj)
       } catch (error) {
