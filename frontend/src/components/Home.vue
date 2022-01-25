@@ -9,11 +9,54 @@
             ></v-text-field>
             <v-text-field label="Another input"></v-text-field>
         </div>
+        <div class="searchBlock">
+            <div v-for="b in boms" :key="b.uuid">
+                {{ b.uuid }}
+                <v-icon>mdi-download-outline</v-icon>
+            </div>
+        </div>
+        <v-table height="600px">
+            <thead>
+            <tr>
+                <th class="text-left">
+                Bom Version
+                </th>
+                <th class="text-left">
+                Group
+                </th>
+                <th class="text-left">
+                Name
+                </th>
+                <th class="text-left">
+                Version
+                </th>
+                <th class="text-left">
+                Actions
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr
+                v-for="b in boms"
+                :key="b.uuid"
+            >
+                <td class="text-left">{{ b.uuid }}</td>
+                <td class="text-left">{{ b.meta }}</td>
+                <td class="text-left">{{ b.uuid }}</td>
+                <td class="text-left">{{ b.meta }}</td>
+                <td class="text-left">
+                    <v-icon>mdi-eye-outline</v-icon>
+                    <v-icon>mdi-download-outline</v-icon>
+                </td>
+            </tr>
+            </tbody>
+        </v-table>
+        <div>end of doc</div>
     </div>
 </template>
 
 <script lang="ts">
-import { ref } from 'vue'
+// import { ref } from 'vue'
 import { computed } from 'vue'
 import gql from 'graphql-tag'
 import graphqlClient from '../utils/graphql'
@@ -37,12 +80,29 @@ export default {
         }
         const boms = await searchBom(bomSearchObj)
 
-        const items = ref(['This', 'is'])
+        const headers = [
+            {text: 'Bom Version', value: 'bomversion'}, 
+            {text: 'Group', value: 'group'},
+            {text: 'Name', value: 'name'}, 
+            {text: 'Component Version', value: 'version'},
+            {text: 'Actions', value: 'actions'}
+        ]
+
+        const bomsTest = [
+            {
+                bomversion: '1',
+                group: '2',
+                name: '3',
+                version: '4',
+                actions: '5'
+            }
+        ]
 
         return {
             boms,
+            bomsTest,
             vTitle,
-            items,
+            headers,
             hello
         }
     }
@@ -65,7 +125,6 @@ async function fetchHello() {
                 hello
             }`
     })
-    console.log(response.data)
     return response.data.hello
 }
 
@@ -80,8 +139,7 @@ async function searchBom(bomSearch: BomSearch) {
             }`,
         variables: bomSearch
     })
-    console.log(response.data)
-    return response.data.bomSearch
+    return response.data.findBom
 }
 
 </script>
