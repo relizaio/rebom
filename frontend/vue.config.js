@@ -11,6 +11,11 @@ module.exports = {
             target: 'http://localhost:4000',
             ws: true,
             changeOrigin: true
+        },
+        '^/restapi': {
+          target: 'http://localhost:4000',
+          ws: true,
+          changeOrigin: true
         }
     }
   }
