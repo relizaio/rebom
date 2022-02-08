@@ -4,19 +4,30 @@ import express from 'express'
 import http from 'http'
 const utils = require('./utils')
 
-type GqlUrl = {
-    url: string
-}
-
 type BomRecord = {
   uuid: string,
   created_date: Date,
   last_updated_date: Date,
   meta: string,
-  bom: Object,
+  bom: any,
   tags: Object,
   organization: string,
   public: boolean
+}
+
+type BomDto = {
+  uuid: string,
+  createdDate: Date,
+  lastUpdatedDate: Date,
+  meta: string,
+  bom: Object,
+  tags: Object,
+  organization: string,
+  public: boolean,
+  bomVersion: string,
+  group: string,
+  name: string,
+  version: string
 }
 
 type BomInput = {
@@ -59,13 +70,17 @@ const typeDefs = gql`
 
   type Bom {
     uuid: ID!
-    created_date: DateTime
-    last_updated_date: DateTime
+    createdDate: DateTime
+    lastUpdatedDate: DateTime
     meta: String
     bom: Object
     tags: Object
     organization: ID
     public: Boolean
+    bomVersion: String
+    group: String
+    name: String
+    version: String
   }
 
   input BomInput {
@@ -90,12 +105,12 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     hello: () => 'world',
-    allBoms: async () => {
+    allBoms: async () : Promise<BomDto[]> => {
       let queryRes = await utils.runQuery('select * from rebom.boms', []) 
       let boms = queryRes.rows as BomRecord[]
-      return boms
+      return boms.map(b => bomRecordToDto(b))
     },
-    findBom: async (parent: any, bomSearch : BomSearch) => {
+    findBom: async (parent: any, bomSearch : BomSearch) : Promise<BomDto[]> => {
       return findBom(bomSearch)
     },
     bomById: async (parent: any, id: any): Promise<Object> => {
@@ -153,7 +168,7 @@ const resolvers = {
   }
 }
 
-async function findBom (bomSearch: BomSearch): Promise<BomRecord[]> {
+async function findBom (bomSearch: BomSearch): Promise<BomDto[]> {
   let searchObject = {
     queryText: `select * from rebom.boms where 1 = 1`,
     queryParams: [],
@@ -179,13 +194,42 @@ async function findBom (bomSearch: BomSearch): Promise<BomRecord[]> {
       bomSearch.bomSearch.componentName)
 
   let queryRes = await utils.runQuery(searchObject.queryText, searchObject.queryParams)
-  return queryRes.rows
+  let bomRecords = queryRes.rows as BomRecord[]
+  return bomRecords.map(b => bomRecordToDto(b))
 }
 
 function updateSearchObj(searchObject: SearchObject, queryPath: string, addParam: string) {
   searchObject.queryText += `AND ${queryPath} = $${searchObject.paramId}`
   searchObject.queryParams.push(addParam)
   ++searchObject.paramId
+}
+
+function bomRecordToDto(bomRecord: BomRecord) : BomDto {
+  let version = ''
+  let group = ''
+  let name = ''
+  let bomVersion = ''
+  if (bomRecord.bom) bomVersion = bomRecord.bom.version
+  if (bomRecord.bom && bomRecord.bom.metadata && bomRecord.bom.metadata.component) {
+    version = bomRecord.bom.metadata.component.version
+    name = bomRecord.bom.metadata.component.name
+    group = bomRecord.bom.metadata.component.name
+  }
+  let bomDto : BomDto = {
+    uuid: bomRecord.uuid,
+    createdDate: bomRecord.created_date,
+    lastUpdatedDate: bomRecord.last_updated_date,
+    meta: bomRecord.meta,
+    bom: bomRecord.bom,
+    tags: bomRecord.tags,
+    organization: bomRecord.organization,
+    public: bomRecord.public,
+    bomVersion: bomVersion,
+    group: group,
+    name: name,
+    version: version
+  }
+  return bomDto
 }
 
 async function startApolloServer(typeDefs: any, resolvers: any) {
