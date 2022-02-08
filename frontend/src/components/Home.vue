@@ -9,12 +9,6 @@
             ></v-text-field>
             <v-text-field label="Another input"></v-text-field>
         </div>
-        <div class="searchBlock">
-            <div v-for="b in boms" :key="b.uuid">
-                {{ b.uuid }}
-                <v-icon>mdi-download-outline</v-icon>
-            </div>
-        </div>
         <v-table height="600px">
             <thead>
             <tr>
@@ -40,10 +34,10 @@
                 v-for="b in boms"
                 :key="b.uuid"
             >
-                <td class="text-left">{{ b.uuid }}</td>
-                <td class="text-left">{{ b.meta }}</td>
-                <td class="text-left">{{ b.uuid }}</td>
-                <td class="text-left">{{ b.meta }}</td>
+                <td class="text-left">{{ b.bomVersion }}</td>
+                <td class="text-left">{{ b.group }}</td>
+                <td class="text-left">{{ b.name }}</td>
+                <td class="text-left">{{ b.version }}</td>
                 <td class="text-left">
                     <v-icon>mdi-eye-outline</v-icon>
                     <v-icon>mdi-download-outline</v-icon>
@@ -68,7 +62,6 @@ export default {
     },
     async setup(props: any) {
         const vTitle = computed(() => '-' + props.msg + '-')
-        const hello = await fetchHello()
         let bomSearchObj : BomSearch = {
             bomSearch: {
                 serialNumber: '',
@@ -102,8 +95,7 @@ export default {
             boms,
             bomsTest,
             vTitle,
-            headers,
-            hello
+            headers
         }
     }
 }
@@ -118,16 +110,6 @@ type BomSearch = {
   }
 }
 
-async function fetchHello() {
-    const response = await graphqlClient.query({
-        query: gql`
-            query {
-                hello
-            }`
-    })
-    return response.data.hello
-}
-
 async function searchBom(bomSearch: BomSearch) {
     const response = await graphqlClient.query({
         query: gql`
@@ -135,6 +117,10 @@ async function searchBom(bomSearch: BomSearch) {
                 findBom(bomSearch: $bomSearch) {
                     uuid
                     meta
+                    version
+                    bomVersion
+                    group
+                    name
                 }
             }`,
         variables: bomSearch
