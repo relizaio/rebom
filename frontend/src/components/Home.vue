@@ -39,8 +39,12 @@
                 <td class="text-left">{{ b.name }}</td>
                 <td class="text-left">{{ b.version }}</td>
                 <td class="text-left">
-                    <v-icon>mdi-eye-outline</v-icon>
-                    <v-icon>mdi-download-outline</v-icon>
+                    <a :href="'/restapi/bomById/' + b.uuid" target="_blank" rel="noopener noreferrer" title="Open Bom in New Tab">
+                        <v-icon>mdi-eye-outline</v-icon>
+                    </a>
+                    <a :href="'/restapi/bomById/' + b.uuid + '?download=true'" target="_blank" rel="noopener noreferrer" title="Download Bom">
+                        <v-icon>mdi-download-outline</v-icon>
+                    </a>
                 </td>
             </tr>
             </tbody>
@@ -131,7 +135,7 @@ async function searchBom(bomSearch: BomSearch) {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="scss">
 h3 {
   margin: 40px 0 0;
 }
@@ -145,5 +149,6 @@ li {
 }
 a {
   color: #42b983;
+  text-decoration: none;
 }
 </style>
