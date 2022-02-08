@@ -44,7 +44,9 @@ type BomSearch = {
     version: string,
     componentVersion: string,
     componentGroup: string,
-    componentName: string
+    componentName: string,
+    page: number,
+    offset: number
   }
 }
 
@@ -94,7 +96,9 @@ const typeDefs = gql`
     version: String
     componentVersion: String
     componentGroup: String
-    componentName: String
+    componentName: String,
+    page: Int,
+    offset: Int
   }
 
   scalar Object
@@ -136,7 +140,9 @@ const resolvers = {
             version: '',
             componentVersion: '',
             componentGroup: '',
-            componentName: ''
+            componentName: '',
+            page: 0,
+            offset: 0
           }
         }
         // if bom record found then update, otherwise insert
@@ -150,7 +156,9 @@ const resolvers = {
               version: bomInput.bomInput.bom.version as string,
               componentVersion: bomInput.bomInput.bom.metadata.component.version as string,
               componentGroup: bomInput.bomInput.bom.metadata.component.group as string,
-              componentName: bomInput.bomInput.bom.metadata.component.name as string
+              componentName: bomInput.bomInput.bom.metadata.component.name as string,
+              page: 0,
+              offset: 0
             }
           }
           bomRecord = await findBom(bomSearch)
