@@ -213,7 +213,7 @@ function bomRecordToDto(bomRecord: BomRecord) : BomDto {
   if (bomRecord.bom && bomRecord.bom.metadata && bomRecord.bom.metadata.component) {
     version = bomRecord.bom.metadata.component.version
     name = bomRecord.bom.metadata.component.name
-    group = bomRecord.bom.metadata.component.name
+    group = bomRecord.bom.metadata.component.group
   }
   let bomDto : BomDto = {
     uuid: bomRecord.uuid,
