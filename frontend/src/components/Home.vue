@@ -2,20 +2,22 @@
     <div>
         <h1>Rebom - Catalog of Software Bills of Materials</h1>
         <div>
-            <v-text-field
-                label="Search Query"
-                hide-details="auto"
-                v-model="searchQuery"
-            >
-                <template v-slot:append>
-                    <v-btn 
-                        variant="contained-text"
-                        size="x-large"
-                        @click="userSearch">
-                        Find
-                    </v-btn>
-                </template>
-            </v-text-field>
+            <v-form @submit="userSearch">
+                <v-text-field
+                    label="Search Query"
+                    hide-details="auto"
+                    v-model="searchQuery"
+                >
+                    <template v-slot:append>
+                        <v-btn
+                            type="submit"
+                            variant="contained-text"
+                            size="x-large">
+                            Find
+                        </v-btn>
+                    </template>
+                </v-text-field>
+            </v-form>
         </div>
         <v-table height="600px">
             <thead>
@@ -107,8 +109,8 @@ export default {
         ]
 
         const searchQuery = ref('')
-        async function userSearch () {
-            console.log(searchQuery)
+        async function userSearch (e:any) {
+            e.preventDefault()
             bomSearchObj = {
                 bomSearch: {
                     serialNumber: '',
@@ -120,7 +122,6 @@ export default {
                 }
             }
             boms.value = await searchBom(bomSearchObj)
-            console.log(boms)
         }
 
         return {
