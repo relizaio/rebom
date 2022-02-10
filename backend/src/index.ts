@@ -45,6 +45,7 @@ type BomSearch = {
     componentVersion: string,
     componentGroup: string,
     componentName: string,
+    singleQuery: string,
     page: number,
     offset: number
   }
@@ -97,6 +98,7 @@ const typeDefs = gql`
     componentVersion: String
     componentGroup: String
     componentName: String,
+    singleQuery: String,
     page: Int,
     offset: Int
   }
@@ -141,6 +143,7 @@ const resolvers = {
             componentVersion: '',
             componentGroup: '',
             componentName: '',
+            singleQuery: '',
             page: 0,
             offset: 0
           }
@@ -157,6 +160,7 @@ const resolvers = {
               componentVersion: bomInput.bomInput.bom.metadata.component.version as string,
               componentGroup: bomInput.bomInput.bom.metadata.component.group as string,
               componentName: bomInput.bomInput.bom.metadata.component.name as string,
+              singleQuery: '',
               page: 0,
               offset: 0
             }
@@ -183,25 +187,65 @@ async function findBom (bomSearch: BomSearch): Promise<BomDto[]> {
     paramId: 1
   }
 
-  if (bomSearch.bomSearch.serialNumber) {
-    if (!bomSearch.bomSearch.serialNumber.startsWith('urn')) {
-      bomSearch.bomSearch.serialNumber = 'urn:uuid:' + bomSearch.bomSearch.serialNumber
+  let bomDtos: BomDto[] = []
+
+  if (bomSearch.bomSearch.singleQuery) {
+    bomDtos = await findBomViaSingleQuery(bomSearch.bomSearch.singleQuery)
+  } else {
+    if (bomSearch.bomSearch.serialNumber) {
+      if (!bomSearch.bomSearch.serialNumber.startsWith('urn')) {
+        bomSearch.bomSearch.serialNumber = 'urn:uuid:' + bomSearch.bomSearch.serialNumber
+      }
+      updateSearchObj(searchObject, `bom->>'serialNumber'`, bomSearch.bomSearch.serialNumber)
     }
-    updateSearchObj(searchObject, `bom->>'serialNumber'`, bomSearch.bomSearch.serialNumber)
+
+    if (bomSearch.bomSearch.version) updateSearchObj(searchObject, `bom->>'version'`, bomSearch.bomSearch.version)
+
+    if (bomSearch.bomSearch.componentVersion) updateSearchObj(searchObject, `bom->'metadata'->'component'->>'version'`, 
+        bomSearch.bomSearch.componentVersion)
+    
+    if (bomSearch.bomSearch.componentGroup) updateSearchObj(searchObject, `bom->'metadata'->'component'->>'group'`, 
+        bomSearch.bomSearch.componentGroup)
+    
+    if (bomSearch.bomSearch.componentName) updateSearchObj(searchObject, `bom->'metadata'->'component'->>'name'`, 
+        bomSearch.bomSearch.componentName)
+
+    let queryRes = await utils.runQuery(searchObject.queryText, searchObject.queryParams)
+    let bomRecords = queryRes.rows as BomRecord[]
+    bomDtos = bomRecords.map(b => bomRecordToDto(b))
+  }
+  return bomDtos
+}
+
+async function findBomViaSingleQuery(singleQuery: string): Promise<BomDto[]> {
+  let proceed: boolean = false
+  // 1. search by uuid
+  let queryRes = await utils.runQuery(`select * from rebom.boms where bom->>'serialNumber' = $1`, [singleQuery])
+  proceed = (queryRes.rows.length < 1)
+
+  if (proceed) {
+    queryRes = await utils.runQuery(`select * from rebom.boms where bom->>'serialNumber' = $1`, ['urn:uuid:' + singleQuery])
+    proceed = (queryRes.rows.length < 1)
   }
 
-  if (bomSearch.bomSearch.version) updateSearchObj(searchObject, `bom->>'version'`, bomSearch.bomSearch.version)
+  // 2. search by name
+  if (proceed) {
+    queryRes = await utils.runQuery(`select * from rebom.boms where bom->'metadata'->'component'->>'name' like $1`, ['%' + singleQuery + '%'])
+    proceed = (queryRes.rows.length < 1)
+  }
 
-  if (bomSearch.bomSearch.componentVersion) updateSearchObj(searchObject, `bom->'metadata'->'component'->>'version'`, 
-      bomSearch.bomSearch.componentVersion)
-  
-  if (bomSearch.bomSearch.componentGroup) updateSearchObj(searchObject, `bom->'metadata'->'component'->>'group'`, 
-      bomSearch.bomSearch.componentGroup)
-  
-  if (bomSearch.bomSearch.componentName) updateSearchObj(searchObject, `bom->'metadata'->'component'->>'name'`, 
-      bomSearch.bomSearch.componentName)
+  // 3. search by group
+  if (proceed) {
+    queryRes = await utils.runQuery(`select * from rebom.boms where bom->'metadata'->'component'->>'group' like $1`, ['%' + singleQuery + '%'])
+    proceed = (queryRes.rows.length < 1)
+  }
 
-  let queryRes = await utils.runQuery(searchObject.queryText, searchObject.queryParams)
+  // 3. search by version
+  if (proceed) {
+    queryRes = await utils.runQuery(`select * from rebom.boms where bom->'metadata'->'component'->>'version' = $1`, [singleQuery])
+    proceed = (queryRes.rows.length < 1)
+  }
+
   let bomRecords = queryRes.rows as BomRecord[]
   return bomRecords.map(b => bomRecordToDto(b))
 }

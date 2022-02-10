@@ -1,13 +1,21 @@
 <template>
     <div>
-        Hello page {{ vTitle }}
-        Fetched hello: {{ hello }}
+        <h1>Rebom - Catalog of Software Bills of Materials</h1>
         <div>
             <v-text-field
-            label="Main input"
-            hide-details="auto"
-            ></v-text-field>
-            <v-text-field label="Another input"></v-text-field>
+                label="Search Query"
+                hide-details="auto"
+                v-model="searchQuery"
+            >
+                <template v-slot:append>
+                    <v-btn 
+                        variant="contained-text"
+                        size="x-large"
+                        @click="userSearch">
+                        Find
+                    </v-btn>
+                </template>
+            </v-text-field>
         </div>
         <v-table height="600px">
             <thead>
@@ -55,27 +63,30 @@
 
 <script lang="ts">
 // import { ref } from 'vue'
-import { computed } from 'vue'
+// import { computed } from 'vue'
 import gql from 'graphql-tag'
 import graphqlClient from '../utils/graphql'
 
+// import { useModelWrapper } from '../utils/utils'
+import { ref } from 'vue';
+
 export default {
     name: 'Home',
-    props: {
-        msg: String
+    props: { 
+        queryValue: String
     },
-    async setup(props: any) {
-        const vTitle = computed(() => '-' + props.msg + '-')
+    async setup(/*props : any, { emit } : any*/) {
         let bomSearchObj : BomSearch = {
             bomSearch: {
                 serialNumber: '',
                 version: '',
                 componentVersion: '',
                 componentGroup: '',
-                componentName: ''
+                componentName: '',
+                singleQuery: ''
             }
         }
-        const boms = await searchBom(bomSearchObj)
+        let boms = ref(await searchBom(bomSearchObj))
 
         const headers = [
             {text: 'Bom Version', value: 'bomversion'}, 
@@ -95,11 +106,29 @@ export default {
             }
         ]
 
+        const searchQuery = ref('')
+        async function userSearch () {
+            console.log(searchQuery)
+            bomSearchObj = {
+                bomSearch: {
+                    serialNumber: '',
+                    version: '',
+                    componentVersion: '',
+                    componentGroup: '',
+                    componentName: '',
+                    singleQuery: searchQuery.value
+                }
+            }
+            boms.value = await searchBom(bomSearchObj)
+            console.log(boms)
+        }
+
         return {
             boms,
             bomsTest,
-            vTitle,
-            headers
+            headers,
+            userSearch,
+            searchQuery
         }
     }
 }
@@ -110,7 +139,8 @@ type BomSearch = {
     version: string,
     componentVersion: string,
     componentGroup: string,
-    componentName: string
+    componentName: string,
+    singleQuery: string
   }
 }
 
@@ -127,7 +157,8 @@ async function searchBom(bomSearch: BomSearch) {
                     name
                 }
             }`,
-        variables: bomSearch
+        variables: bomSearch,
+        fetchPolicy: 'no-cache'
     })
     return response.data.findBom
 }
