@@ -1,0 +1,56 @@
+version: '3.8'
+services:
+  rebom-backend:
+    image: rebom-backend-local
+    environment:
+     - POSTGRES_HOST=rebom-postgresql
+     - POSTGRES_PORT=5432
+    depends_on:
+     - rebom-postgresql
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      update_config:
+        parallelism: 1
+        delay: 10s
+  rebom-frontend:
+    image: rebom-frontend-local
+    ports:
+     - "8111:80"
+    environment:
+     - BACKEND_HOST=rebom-backend
+     - BACKEND_PORT=4000
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      update_config:
+        parallelism: 1
+        delay: 10s
+    depends_on:
+     - rebom-backend
+  rebom-postgres-init:
+    image: 'flyway/flyway:8.4.4-alpine'
+    restart: on-failure
+    depends_on:
+      - rebom-postgresql
+    command:
+      [
+        '-url=jdbc:postgresql://rebom-postgresql:5432/postgres',
+        '-user=postgres',
+        '-password=password',
+        '-defaultSchema=rebom',
+        '-schemas=rebom',
+        'migrate'
+      ]
+    volumes:
+      - ./backend/migrations:/flyway/sql
+  rebom-postgresql:
+    image: postgres:14.1
+    environment:
+     - POSTGRES_PASSWORD=password
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
