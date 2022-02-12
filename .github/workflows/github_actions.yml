@@ -147,7 +147,7 @@ jobs:
         if: env.DO_BUILD == 'true'
         run: |
           cd $DIR
-          echo -n "-k ${{ secrets.RELIZA_BACKEND_API_KEY }} -i ${{ secrets.RELIZA_BACKEND_API_ID }} -b $GITHUB_REF \
+          echo -n "-k ${{ secrets.RELIZA_FRONTEND_API_KEY }} -i ${{ secrets.RELIZA_FRONTEND_API_ID }} -b $GITHUB_REF \
             --commit $GITHUB_SHA --commitmessage \"$(git log -1 --pretty='%s')\" \
             --date $(git log -1 --date=iso-strict --pretty='%ad') \
             --vcstype git --vcsuri github.com/$GITHUB_REPOSITORY " >> get_version_command
