@@ -59,7 +59,6 @@
             </tr>
             </tbody>
         </v-table>
-        <div>end of doc</div>
     </div>
 </template>
 
