@@ -24,7 +24,7 @@ jobs:
           cd $DIR
           dobuild=false
           last_commit=$(docker run --rm relizaio/reliza-cli getlatestrelease -i ${{ secrets.RELIZA_BACKEND_API_ID }} -k ${{ secrets.RELIZA_BACKEND_API_KEY }} --branch $GITHUB_REF | jq -r ".sourceCodeEntryDetails.commit")
-          if [ ! -z "$last_commit" && "null" != "$last_commit"]
+          if [ ! -z "$last_commit" && "null" != "$last_commit" ]
           then
             echo -n "--commits $(git log $last_commit..$GITHUB_SHA --date=iso-strict --pretty='%H|||%ad|||%s' -- $DIR | base64 -w 0) " > get_version_command
             difflines=$(git diff $last_commit..$GITHUB_SHA $DIR | wc -l)
@@ -41,7 +41,9 @@ jobs:
         run: |
           cd $DIR
           echo -n "-k ${{ secrets.RELIZA_BACKEND_API_KEY }} -i ${{ secrets.RELIZA_BACKEND_API_ID }} -b $GITHUB_REF \
-            $(cat commit_list) --vcstype git --vcsuri github.com/$GITHUB_REPOSITORY " >> get_version_command
+            --commit $GITHUB_SHA --commitmessage \"$(git log -1 --pretty='%s')\" \
+            --date $(git log -1 --date=iso-strict --pretty='%ad') \
+            --vcstype git --vcsuri github.com/$GITHUB_REPOSITORY " >> get_version_command
           # debug
           echo "$(cat get_version_command)"
           # get version
