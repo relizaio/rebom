@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   rebom-backend:
-    image: rebom-backend-local
+    image: registry.relizahub.com/library/rebom-backend
     environment:
      - POSTGRES_HOST=rebom-postgresql
      - POSTGRES_PORT=5432
@@ -15,7 +15,7 @@ services:
         parallelism: 1
         delay: 10s
   rebom-frontend:
-    image: rebom-frontend-local
+    image: registry.relizahub.com/library/rebom-frontend
     ports:
      - "8111:80"
     environment:
