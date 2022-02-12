@@ -38,7 +38,8 @@ jobs:
       - name: Get Version
         if: env.DO_BUILD == 'true'
         run: |
-          echo -n "-k ${{ secrets.RELIZA_BACKEND_API_KEY }} -i ${{ secrets.RELIZA_BACKEND_API_ID }} -b $GITHUB_REF --metadata GitHub \
+          cd $DIR
+          echo -n "-k ${{ secrets.RELIZA_BACKEND_API_KEY }} -i ${{ secrets.RELIZA_BACKEND_API_ID }} -b $GITHUB_REF \
             $(cat commit_list) --vcstype git --vcsuri github.com/$GITHUB_REPOSITORY " >> get_version_command
           # debug
           echo "$(cat get_version_command)"
