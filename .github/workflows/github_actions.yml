@@ -52,6 +52,7 @@ jobs:
       - name: Extract Actual Version From JSON
         if: env.DO_BUILD == 'true'
         run: |
+          cd $DIR
           full_ver=$(echo $RLZ_VER_JSON | jq -r ".version")
           # version without meta for docker registry
           short_ver=$(echo $RLZ_VER_JSON | jq -r ".dockerTagSafeVersion")
@@ -59,11 +60,12 @@ jobs:
           echo "RLZ_SHORT_VER=$short_ver" >> $GITHUB_ENV
       - name: Instantiate Reliza status as Rejected to handle possible build failure
         if: env.DO_BUILD == 'true'
-        run: echo "--status rejected " > reliza_command
+        run: cd $DIR; echo "--status rejected " > reliza_command
       - name: Build and push docker container to Docker Hub
         if: env.DO_BUILD == 'true'
         continue-on-error: true
         run: |
+          cd $DIR
           docker build -t $IMAGE_NAMESPACE/$IMAGE_NAME:$RLZ_SHORT_VER -t $IMAGE_NAMESPACE/$IMAGE_NAME:latest --build-arg VERSION=$RLZ_FULL_VER  \
             --build-arg CI_ENV=github$GITHUB_SHA --build-arg GIT_COMMIT=$GITHUB_SHA --build-arg GIT_BRANCH=$GITHUB_REF .
           docker_sha_256=$(docker push $IMAGE_NAMESPACE/$IMAGE_NAME:$RLZ_SHORT_VER | grep sha256 | cut -f 3 -d ' ')
@@ -75,6 +77,7 @@ jobs:
       - name: Submit metadata to Reliza Hub
         if: env.DO_BUILD == 'true'
         run: |
+          cd $DIR
           echo -n "-b $GITHUB_REF -k ${{ secrets.RELIZA_BACKEND_API_KEY }} -i ${{ secrets.RELIZA_BACKEND_API_ID }} -v $RLZ_FULL_VER " >> reliza_command
           echo -n "--artid $IMAGE_NAMESPACE/$IMAGE_NAME " >> reliza_command
           echo -n "--artbuildid github$GITHUB_ACTION$GITHUB_SHA " >> reliza_command
@@ -95,6 +98,7 @@ jobs:
       - name: Fail build if reliza status is rejected
         if: env.DO_BUILD == 'true'
         run: |
+          cd $DIR
           status_rejected_check=$(grep 'status rejected' reliza_command | wc -l)
           if [ "$status_rejected_check" != "0" ]
           then
