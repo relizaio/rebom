@@ -1,6 +1,6 @@
 # Rebom by Reliza
 
-## Catalog of Software Bills of Materials (SBoM)
+## Catalog of Software Bills of Materials (SBOMs)
 
 Rebom works with [CycloneDX](https://cyclonedx.org) json standard.
 
