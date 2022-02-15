@@ -1,0 +1,44 @@
+{{- if .Values.ingress.traefikEnabled}}
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: web-ingressroute
+  namespace: {{ .Release.Namespace }}
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`{{ .Values.ingress.host}}`)
+    kind: Rule
+    services:
+    - name: rebom-frontend-service
+      port: 80
+    middlewares:
+      - name: redirect
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: websecure-ingressroute
+  namespace: {{ .Release.Namespace }}
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`{{ .Values.ingress.host}}`)
+    kind: Rule
+    services:
+    - name: rebom-frontend-service
+      port: 80
+  tls:
+    certResolver: le
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect
+  namespace: {{ .Release.Namespace }}
+spec:
+  redirectScheme:
+    scheme: https
+{{- end}}

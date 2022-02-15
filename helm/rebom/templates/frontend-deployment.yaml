@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rebom-frontend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    name: rebom-frontend
+    app: rebom
+spec:
+  replicas: {{ .Values.frontend.replicaCount }}
+  selector:
+    matchLabels:
+      app: rebom
+      name: rebom-frontend
+  template:
+    metadata:
+      labels:
+        name: rebom-frontend
+        app: rebom
+    spec:
+      containers:
+      - name: rebom-frontend
+        image: {{ .Values.frontend.image }}
+        env:
+        - name: BACKEND_HOST
+          value: rebom-backend-service
+        - name: BACKEND_PORT
+          value: {{ .Values.backend.port | quote }}
+        ports:
+        - containerPort: 80

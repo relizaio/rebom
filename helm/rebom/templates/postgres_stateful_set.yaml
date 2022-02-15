@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: rebom
+      name: postgres
+  replicas: {{ .Values.postgresql.replicaCount }}
+  serviceName: postgres
+  template:
+    metadata:
+      labels:
+        name: postgres
+        app: rebom
+    spec:
+      containers:
+        - name: postgres-container
+          image: {{ .Values.postgresql.image}}
+          env:
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: pgpassword
+                key: password
+          ports:
+          - containerPort: 5432
+          volumeMounts:
+          - mountPath: "/var/lib/postgresql/data"
+            name: postgres-data
+            subPath: postgres
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: {{ .Values.postgresql.storage }}
+

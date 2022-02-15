@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rebom-backend-service
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    app: rebom
+    name: rebom-backend
+  ports:
+    - protocol: TCP
+      port: {{ .Values.backend.port }}
+      targetPort: {{ .Values.backend.targetPort }}
+
