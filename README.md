@@ -2,12 +2,12 @@
 
 ## Catalog of Software Bills of Materials (SBoM)
 
-Rebom works [CycloneDX](https://cyclonedx.org) json standard.
+Rebom works with [CycloneDX](https://cyclonedx.org) json standard.
 
 ## Running SBOM
 
 ### With Docker-compose
-Clone this repository and run
+Clone this repository and run the following command:
 
 ```
 docker-compose up -d
@@ -28,7 +28,7 @@ Download [Reliza CLI](https://github.com/relizaio/reliza-cli) for your platform.
 Add reliza-cli to path and run following command to load bom json:
 
 ```
-reliza-cli rebom put --rebomuri http://localhost  --infile "tests/bom_versioning_1.json"
+reliza-cli rebom put --rebomuri http://localhost --infile "tests/bom_versioning_1.json"
 ```
 
 Flags used:
