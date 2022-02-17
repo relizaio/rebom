@@ -302,8 +302,8 @@ jobs:
           docker run --rm -v $(pwd)/$HELM_CHART_NAME:/apps/helm relizaio/helmpush cm-push /apps/helm $HELM_CHART_REPO -u '${{ secrets.DOCKER_LOGIN }}' -p '${{ secrets.DOCKER_TOKEN }}'
           
           # download and compute sha256 digest for helm chart package tgz
-          docker run --rm -v $(pwd)/$HELM_CHART_NAME:/apps/helm --entrypoint /bin/sh relizaio/helmpush -c "helm repo add repo $HELM_CHART_REPO --username '${{ secrets.DOCKER_LOGIN }}' --password '${{ secrets.DOCKER_TOKEN }}' && helm pull repo/$HELM_CHART_NAME -d /apps/helm/"
-          sha_digest=$(sha256sum helm/*.tgz | cut -f 1 -d ' ')
+          docker run --rm -v $(pwd):/apps/helm --entrypoint /bin/sh relizaio/helmpush -c "helm repo add repo $HELM_CHART_REPO --username '${{ secrets.DOCKER_LOGIN }}' --password '${{ secrets.DOCKER_TOKEN }}' && helm pull repo/$HELM_CHART_NAME -d /apps/helm/"
+          sha_digest=$(sha256sum $(pwd)/*.tgz | cut -f 1 -d ' ')
           echo "shadigest = $sha_digest"
           
           # submit build data to Reliza Hub
