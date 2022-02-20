@@ -1,5 +1,8 @@
 <template>
     <div>
+        <div class="giveUsAStar">
+            <a href="https://github.com/relizaio/rebom"><v-icon>mdi-github</v-icon></a>
+        </div>
         <h1>Rebom - Catalog of Software Bills of Materials</h1>
         <div>
             <v-form @submit="userSearch">
@@ -67,8 +70,6 @@
 // import { computed } from 'vue'
 import gql from 'graphql-tag'
 import graphqlClient from '../utils/graphql'
-
-// import { useModelWrapper } from '../utils/utils'
 import { ref } from 'vue';
 
 export default {
@@ -181,5 +182,13 @@ li {
 a {
   color: #42b983;
   text-decoration: none;
+}
+.giveUsAStar {
+    float: right;
+    margin-right: 20px;
+    display: flex;
+}
+.removeFloat {
+    clear: both;
 }
 </style>
