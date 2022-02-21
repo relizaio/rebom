@@ -79,3 +79,8 @@ npm run serve
 Frontend will be listening on localhost, port 3005.
 
 Navigating to http://localhost:3005 in your browser should open Rebom.
+
+
+## Support
+
+Please ask questions or share comments at DevOps and DataOps Discord - https://devopscommunity.org - for support.
