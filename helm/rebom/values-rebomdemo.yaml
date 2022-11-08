@@ -18,4 +18,4 @@ flyway:
 ingress:
   minimalIngressEnabled: false
   traefikEnabled: true
-  host: rebodemo.relizahub.com
+  host: rebomdemo.relizahub.com
