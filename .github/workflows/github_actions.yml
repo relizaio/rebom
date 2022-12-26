@@ -16,6 +16,7 @@ jobs:
         with:
           registry_username: ${{ secrets.DOCKER_LOGIN }}
           registry_password: ${{ secrets.DOCKER_TOKEN }}
+          registry_host: registry.relizahub.com
           image_namespace: $IMAGE_NAMESPACE
           image_name: $IMAGE_NAME
           reliza_api_id: ${{ secrets.RELIZA_BACKEND_API_ID }}
@@ -34,6 +35,7 @@ jobs:
         with:
           registry_username: ${{ secrets.DOCKER_LOGIN }}
           registry_password: ${{ secrets.DOCKER_TOKEN }}
+          registry_host: registry.relizahub.com
           image_namespace: $IMAGE_NAMESPACE
           image_name: $IMAGE_NAME
           reliza_api_id: ${{ secrets.RELIZA_FRONTEND_API_ID }}
