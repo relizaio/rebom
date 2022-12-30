@@ -50,7 +50,7 @@ jobs:
       DIR: helm
     steps:
       - name: RelizaHub Build And Submit Release metadata action
-        uses: relizaio/reliza-helm-action@1.2
+        uses: relizaio/reliza-helm-action@master
         with:
           repository_username: ${{ secrets.DOCKER_LOGIN }}
           repository_password: ${{ secrets.DOCKER_TOKEN }}
