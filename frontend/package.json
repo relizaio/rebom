@@ -10,7 +10,6 @@
   "dependencies": {
     "@apollo/client": "^3.7.5",
     "@vue/apollo-option": "^4.0.0-alpha.20",
-    "core-js": "^3.27.2",
     "feather-icons": "^4.29.0",
     "vue": "^3.2.45",
     "vue-class-component": "^8.0.0-rc.1",
