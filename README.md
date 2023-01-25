@@ -54,7 +54,13 @@ docker run --name rebom-postgres -d -p 5438:5432 -e POSTGRES_PASSWORD=password p
 
 You can later start/stop database container using `docker stop rebom-postgres` and `docker start rebom-postgres`.
 
-2. Run backend:
+2. Run Flyway - you can do it using docker:
+ 
+```
+docker run --rm -v $PWD/backend/migrations:/flyway/sql flyway/flyway -url=jdbc:postgresql://host.docker.internal:5438/postgres -user=postgres -password=password -defaultSchema=rebom -schemas='rebom' migrate
+```
+
+3. Run backend:
 
 Backend is an Express.js / Apollo GraphQL project.
 
@@ -66,7 +72,7 @@ npm start
 
 Backend will be listening on localhost, port 4000.
 
-3. Run frontend:
+4. Run frontend:
 
 Frontend is a Vue 3 project.
 
