@@ -31,7 +31,7 @@ services:
     depends_on:
      - rebom-backend
   rebom-postgres-init:
-    image: 'flyway/flyway:8.4.4-alpine'
+    image: 'flyway/flyway:9-alpine'
     restart: on-failure
     depends_on:
       - rebom-postgresql
