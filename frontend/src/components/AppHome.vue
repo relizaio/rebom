@@ -73,7 +73,7 @@ import graphqlClient from '../utils/graphql'
 import { ref } from 'vue';
 
 export default {
-    name: 'Home',
+    name: 'AppHome',
     props: { 
         queryValue: String
     },

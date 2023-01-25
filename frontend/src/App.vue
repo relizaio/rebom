@@ -1,7 +1,7 @@
 <template>
     <Suspense>
         <template #default>
-            <Home msg="abc"/>
+            <app-home msg="abc"/>
         </template>
         <template #fallback>
             <div>Loading...</div>
@@ -11,11 +11,11 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import Home from './components/Home.vue';
+import AppHome from './components/AppHome.vue';
 
 @Options({
   components: {
-    Home,
+   AppHome,
   },
 })
 export default class App extends Vue {}
