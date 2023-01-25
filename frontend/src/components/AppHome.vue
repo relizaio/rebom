@@ -1,28 +1,30 @@
 <template>
     <div>
         <div class="giveUsAStar">
-            <a href="https://github.com/relizaio/rebom"><v-icon>mdi-github</v-icon></a>
+            <a href="https://github.com/relizaio/rebom"><vue-feather type="github"/></a>
         </div>
         <h1>Rebom - Catalog of Software Bills of Materials</h1>
         <div>
-            <v-form @submit="userSearch">
-                <v-text-field
-                    label="Search Query"
-                    hide-details="auto"
-                    v-model="searchQuery"
+            <n-form 
+                inline
+                ref="searchFormRef"
+                @submit="userSearch"
                 >
-                    <template v-slot:append>
-                        <v-btn
-                            type="submit"
-                            variant="contained-text"
-                            size="x-large">
-                            Find
-                        </v-btn>
-                    </template>
-                </v-text-field>
-            </v-form>
+                <n-input-group>
+                    <n-input
+                        class="leftText"
+                        placeholder="BOM Search Query"
+                        v-model:value="searchQuery"
+                    />
+                    <n-button
+                        variant="contained-text"
+                        @click="userSearch">
+                        Find
+                    </n-button>
+                </n-input-group>
+            </n-form>
         </div>
-        <v-table height="600px">
+        <n-table style="margin-top: 30px;">
             <thead>
             <tr>
                 <th class="text-left">
@@ -53,27 +55,32 @@
                 <td class="text-left">{{ b.version }}</td>
                 <td class="text-left">
                     <a :href="'/restapi/bomById/' + b.uuid" target="_blank" rel="noopener noreferrer" title="Open Bom in New Tab">
-                        <v-icon>mdi-eye-outline</v-icon>
+                        <vue-feather type="eye"/>
                     </a>
                     <a :href="'/restapi/bomById/' + b.uuid + '?download=true'" target="_blank" rel="noopener noreferrer" title="Download Bom">
-                        <v-icon>mdi-download-outline</v-icon>
+                        <vue-feather type="download"/>
                     </a>
                 </td>
             </tr>
             </tbody>
-        </v-table>
+        </n-table>
+        <div style="margin-top: 10px; margin-left: 5px;" class="leftText" v-if="!boms || !boms.length">
+            No BOMs found.
+        </div>
     </div>
 </template>
 
 <script lang="ts">
-// import { ref } from 'vue'
-// import { computed } from 'vue'
+import { NForm, NInput, NButton, NInputGroup, NTable, FormInst } from 'naive-ui'
 import gql from 'graphql-tag'
 import graphqlClient from '../utils/graphql'
 import { ref } from 'vue';
 
 export default {
     name: 'AppHome',
+    components: {
+      NForm, NInput, NButton, NInputGroup, NTable
+    },
     props: { 
         queryValue: String
     },
@@ -108,9 +115,11 @@ export default {
             }
         ]
 
+        const searchFormRef = ref<FormInst | null>(null)
         const searchQuery = ref('')
         async function userSearch (e:any) {
             e.preventDefault()
+            console.log(searchQuery)
             bomSearchObj = {
                 bomSearch: {
                     serialNumber: '',
@@ -125,6 +134,7 @@ export default {
         }
 
         return {
+            searchFormRef,
             boms,
             bomsTest,
             headers,
@@ -188,6 +198,10 @@ a {
     margin-right: 20px;
     display: flex;
 }
+.leftText {
+    text-align: left;
+}
+
 .removeFloat {
     clear: both;
 }
