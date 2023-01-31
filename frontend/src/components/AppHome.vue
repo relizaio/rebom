@@ -7,7 +7,6 @@
         <div>
             <n-form 
                 inline
-                ref="searchFormRef"
                 @submit="userSearch"
                 >
                 <n-input-group>
@@ -71,7 +70,7 @@
 </template>
 
 <script lang="ts">
-import { NForm, NInput, NButton, NInputGroup, NTable, FormInst } from 'naive-ui'
+import { NForm, NInput, NButton, NInputGroup, NTable } from 'naive-ui'
 import gql from 'graphql-tag'
 import graphqlClient from '../utils/graphql'
 import { ref } from 'vue';
@@ -115,7 +114,6 @@ export default {
             }
         ]
 
-        const searchFormRef = ref<FormInst | null>(null)
         const searchQuery = ref('')
         async function userSearch (e:any) {
             e.preventDefault()
@@ -134,7 +132,6 @@ export default {
         }
 
         return {
-            searchFormRef,
             boms,
             bomsTest,
             headers,
