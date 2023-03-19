@@ -1,13 +1,9 @@
 backend:
   image: registry.relizahub.com/library/rebom-backend
   replicaCount: 1
-  port: 4000
-  targetPort: 4000
 frontend:
   image: registry.relizahub.com/library/rebom-frontend
   replicaCount: 1
-  port: 80
-  targetPort: 80
 postgresql:
   image: postgres:14.1
   defaultSecret: true

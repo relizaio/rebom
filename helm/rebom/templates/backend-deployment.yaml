@@ -1,35 +1,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rebom-backend
+  name: {{ .Release.Name }}-backend
   namespace: {{ .Release.Namespace }}
   labels:
     name: rebom-backend
     app: rebom
+    {{- include "rebom.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.backend.replicaCount }}
   selector:
     matchLabels:
       app: rebom
       name: rebom-backend
+      {{- include "rebom.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
         name: rebom-backend
         app: rebom
+        {{- include "rebom.selectorLabels" . | nindent 8 }}
     spec:
       containers:
       - name: rebom-backend-container
         image: {{ .Values.backend.image }}
         env:
         - name: POSTGRES_HOST
-          value: postgres
+          value: {{ .Release.Name }}-postgres
         - name: POSTGRES_PORT
           value: "5432"
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: pgpassword
+              name: {{ .Release.Name }}-pgpassword
               key: password
         ports:
         - containerPort: 4000
@@ -44,13 +47,13 @@ spec:
         image: {{ .Values.flyway.image }}
         env:
         - name: POSTGRES_JDBC
-          value: jdbc:postgresql://postgres:5432/postgres
+          value: jdbc:postgresql://{{ .Release.Name }}-postgres:5432/postgres
         - name: POSTGRES_USER
           value: postgres
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: pgpassword
+              name: {{ .Release.Name }}-pgpassword
               key: password
         command: ['/bin/sh', '-c', "/flyway/flyway -url=$POSTGRES_JDBC -user=$POSTGRES_USER -password=$POSTGRES_PASSWORD -defaultSchema=rebom -schemas=rebom migrate"]
         volumeMounts:

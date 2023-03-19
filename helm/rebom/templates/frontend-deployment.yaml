@@ -1,30 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rebom-frontend
+  name: {{ .Release.Name }}-frontend
   namespace: {{ .Release.Namespace }}
   labels:
     name: rebom-frontend
     app: rebom
+    {{- include "rebom.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.frontend.replicaCount }}
   selector:
     matchLabels:
       app: rebom
       name: rebom-frontend
+      {{- include "rebom.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
         name: rebom-frontend
         app: rebom
+        {{- include "rebom.selectorLabels" . | nindent 8 }}
     spec:
       containers:
       - name: rebom-frontend
         image: {{ .Values.frontend.image }}
         env:
         - name: BACKEND_HOST
-          value: rebom-backend-service
+          value: {{ .Release.Name }}-backend-service
         - name: BACKEND_PORT
-          value: {{ .Values.backend.port | quote }}
+          value: "4000"
         ports:
         - containerPort: 80

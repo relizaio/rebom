@@ -1,10 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres
+  name: {{ .Release.Name }}-postgres
   namespace: {{ .Release.Namespace }}
   labels:
     app: rebom
+    {{- include "rebom.labels" . | nindent 4 }}
 spec:
   selector:
     app: rebom

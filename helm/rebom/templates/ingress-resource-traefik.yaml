@@ -11,7 +11,7 @@ spec:
   - match: Host(`{{ .Values.ingress.host}}`)
     kind: Rule
     services:
-    - name: rebom-frontend-service
+    - name: {{ .Release.Name }}-frontend-service
       port: 80
     middlewares:
       - name: redirect
@@ -28,7 +28,7 @@ spec:
   - match: Host(`{{ .Values.ingress.host}}`)
     kind: Rule
     services:
-    - name: rebom-frontend-service
+    - name: {{ .Release.Name }}-frontend-service
       port: 80
   tls:
     certResolver: le
