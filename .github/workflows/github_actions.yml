@@ -12,7 +12,7 @@ jobs:
       DIR: backend
     steps:
       - name: RelizaHub Build And Submit Release metadata action
-        uses: relizaio/reliza-docker-action@1.2
+        uses: relizaio/reliza-docker-action@1.4
         with:
           registry_username: ${{ secrets.DOCKER_LOGIN }}
           registry_password: ${{ secrets.DOCKER_TOKEN }}
