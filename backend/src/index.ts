@@ -1,8 +1,11 @@
-import { ApolloServer, gql } from 'apollo-server-express'
-import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core'
+import { ApolloServer } from '@apollo/server'
+import gql from 'graphql-tag'
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+import { expressMiddleware } from '@apollo/server/express4';
 import express from 'express'
 import http from 'http'
 const utils = require('./utils')
+import bodyParser from 'body-parser';
 
 type BomRecord = {
   uuid: string,
@@ -293,7 +296,6 @@ async function startApolloServer(typeDefs: any, resolvers: any) {
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
   await server.start();
-  server.applyMiddleware({ app });
 
   app.get('/restapi/bomById/:uuid', async (req, res) => {
       let bomId = req.params.uuid
@@ -314,8 +316,13 @@ async function startApolloServer(typeDefs: any, resolvers: any) {
       }
   })
 
+  app.use(
+    bodyParser.json(),
+    expressMiddleware(server)
+  )
+
   await new Promise<void>(resolve => httpServer.listen({ port: 4000 }, resolve));
-  console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
+  console.log(`🚀 Server ready at http://localhost:4000`);
 }
 
 startApolloServer(typeDefs, resolvers)
