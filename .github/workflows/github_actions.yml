@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: RelizaHub Build And Submit Release metadata action
-        uses: relizaio/reliza-helm-action@1.6
+        uses: relizaio/reliza-helm-action@1.7
         with:
           registry_username: ${{ secrets.DOCKER_LOGIN }}
           registry_password: ${{ secrets.DOCKER_TOKEN }}
@@ -49,5 +49,5 @@ jobs:
           reliza_api_id: ${{ secrets.RELIZA_API_ID }}
           reliza_api_key: ${{ secrets.RELIZA_API_KEY }}
           path: helm
-          registry_type: CHARTMEUSEUM
+          registry_type: CHARTMUSEUM
           reliza_project_id: 4aa0e445-9f12-4c80-880a-f919c1761f6c
