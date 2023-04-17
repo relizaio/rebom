@@ -15,9 +15,10 @@ jobs:
           registry_host: registry.relizahub.com
           image_namespace: registry.relizahub.com/library
           image_name: rebom-backend
-          reliza_api_id: ${{ secrets.RELIZA_BACKEND_API_ID }}
-          reliza_api_key: ${{ secrets.RELIZA_BACKEND_API_KEY }}
+          reliza_api_id: ${{ secrets.RELIZA_API_ID }}
+          reliza_api_key: ${{ secrets.RELIZA_API_KEY }}
           path: backend
+          reliza_project_id: 116bbe7f-35ea-4554-bbde-3845059961d5
   build-frontend:
     name: Build And Push Frontend
     runs-on: ubuntu-latest
@@ -30,9 +31,10 @@ jobs:
           registry_host: registry.relizahub.com
           image_namespace: registry.relizahub.com/library
           image_name: rebom-frontend
-          reliza_api_id: ${{ secrets.RELIZA_FRONTEND_API_ID }}
-          reliza_api_key: ${{ secrets.RELIZA_FRONTEND_API_KEY }}
+          reliza_api_id: ${{ secrets.RELIZA_API_ID }}
+          reliza_api_key: ${{ secrets.RELIZA_API_KEY }}
           path: frontend
+          reliza_project_id: a77887b8-2095-46ce-851f-47c72eca863b
   build-helm:
     name: Build And Push Helm Chart
     runs-on: ubuntu-latest
@@ -44,7 +46,8 @@ jobs:
           registry_password: ${{ secrets.DOCKER_TOKEN }}
           registry_host: https://registry.relizahub.com/chartrepo/library/
           helm_chart_name: rebom
-          reliza_api_id: ${{ secrets.RELIZA_HELM_API_ID }}
-          reliza_api_key: ${{ secrets.RELIZA_HELM_API_KEY }}
+          reliza_api_id: ${{ secrets.RELIZA_API_ID }}
+          reliza_api_key: ${{ secrets.RELIZA_API_KEY }}
           path: helm
           registry_type: CHARTMEUSEUM
+          reliza_project_id: 4aa0e445-9f12-4c80-880a-f919c1761f6c
