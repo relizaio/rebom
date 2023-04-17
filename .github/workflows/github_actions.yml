@@ -6,10 +6,6 @@ jobs:
   build-backend:
     name: Build And Push Backend
     runs-on: ubuntu-latest
-    env:
-      IMAGE_NAMESPACE: registry.relizahub.com/library
-      IMAGE_NAME: rebom-backend
-      DIR: backend
     steps:
       - name: RelizaHub Build And Submit Release metadata action
         uses: relizaio/reliza-docker-action@1.4
@@ -17,18 +13,14 @@ jobs:
           registry_username: ${{ secrets.DOCKER_LOGIN }}
           registry_password: ${{ secrets.DOCKER_TOKEN }}
           registry_host: registry.relizahub.com
-          image_namespace: $IMAGE_NAMESPACE
-          image_name: $IMAGE_NAME
+          image_namespace: registry.relizahub.com/library
+          image_name: rebom-backend
           reliza_api_id: ${{ secrets.RELIZA_BACKEND_API_ID }}
           reliza_api_key: ${{ secrets.RELIZA_BACKEND_API_KEY }}
-          path: $DIR
+          path: backend
   build-frontend:
     name: Build And Push Frontend
     runs-on: ubuntu-latest
-    env:
-      IMAGE_NAMESPACE: registry.relizahub.com/library
-      IMAGE_NAME: rebom-frontend
-      DIR: frontend
     steps:
       - name: RelizaHub Build And Submit Release metadata action
         uses: relizaio/reliza-docker-action@1.4
@@ -36,27 +28,23 @@ jobs:
           registry_username: ${{ secrets.DOCKER_LOGIN }}
           registry_password: ${{ secrets.DOCKER_TOKEN }}
           registry_host: registry.relizahub.com
-          image_namespace: $IMAGE_NAMESPACE
-          image_name: $IMAGE_NAME
+          image_namespace: registry.relizahub.com/library
+          image_name: rebom-frontend
           reliza_api_id: ${{ secrets.RELIZA_FRONTEND_API_ID }}
           reliza_api_key: ${{ secrets.RELIZA_FRONTEND_API_KEY }}
-          path: $DIR
+          path: frontend
   build-helm:
     name: Build And Push Helm Chart
     runs-on: ubuntu-latest
-    env:
-      HELM_CHART_REPO: https://registry.relizahub.com/chartrepo/library/
-      HELM_CHART_NAME: rebom
-      DIR: helm
     steps:
       - name: RelizaHub Build And Submit Release metadata action
         uses: relizaio/reliza-helm-action@1.6
         with:
           registry_username: ${{ secrets.DOCKER_LOGIN }}
           registry_password: ${{ secrets.DOCKER_TOKEN }}
-          registry_host: $HELM_CHART_REPO
-          helm_chart_name: $HELM_CHART_NAME
+          registry_host: https://registry.relizahub.com/chartrepo/library/
+          helm_chart_name: rebom
           reliza_api_id: ${{ secrets.RELIZA_HELM_API_ID }}
           reliza_api_key: ${{ secrets.RELIZA_HELM_API_KEY }}
-          path: $DIR
+          path: helm
           registry_type: CHARTMEUSEUM
