@@ -117,7 +117,6 @@ export default {
         const searchQuery = ref('')
         async function userSearch (e:any) {
             e.preventDefault()
-            console.log(searchQuery)
             bomSearchObj = {
                 bomSearch: {
                     serialNumber: '',
