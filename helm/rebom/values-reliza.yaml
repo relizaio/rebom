@@ -1,16 +1,3 @@
-backend:
-  image: registry.relizahub.com/library/rebom-backend
-  replicaCount: 1
-frontend:
-  image: registry.relizahub.com/library/rebom-frontend
-  replicaCount: 1
-postgresql:
-  image: postgres:14.1
-  defaultSecret: true
-  replicaCount: 1
-  storage: 5Gi
-flyway:
-  image: flyway/flyway:8.4.4-alpine
 ingress:
   minimalIngressEnabled: true
   traefikEnabled: true
