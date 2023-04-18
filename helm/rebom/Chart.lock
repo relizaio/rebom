@@ -1,0 +1,6 @@
+dependencies:
+- name: ecr-regcred
+  repository: https://registry.relizahub.com/chartrepo/library
+  version: 0.1.0
+digest: sha256:3e9ed52976600029d854c8e5b8fbda9985fbf5d7723bfa3a1e5c6f0c7cefc4a6
+generated: "2023-04-18T09:27:31.850752-04:00"
