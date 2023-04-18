@@ -23,7 +23,7 @@ spec:
     spec:
       {{- if ne .Values.backend.regcred "none" }}
       imagePullSecrets:
-        - name: .Values.backend.regcred
+        - name: {{ .Values.backend.regcred }}
       {{- end }}
       containers:
       - name: rebom-backend-container
