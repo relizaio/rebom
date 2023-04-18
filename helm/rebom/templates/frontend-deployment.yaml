@@ -21,6 +21,10 @@ spec:
         app: rebom
         {{- include "rebom.selectorLabels" . | nindent 8 }}
     spec:
+      {{- if ne .Values.frontend.regcred "none" }}
+      imagePullSecrets:
+        name: .Values.frontend.regcred
+      {{- end }}
       containers:
       - name: rebom-frontend
         image: {{ .Values.frontend.image }}
