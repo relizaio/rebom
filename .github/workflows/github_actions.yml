@@ -2,6 +2,9 @@ on: [push]
 
 name: Build Docker Image And Submit Metadata To Reliza Hub
 
+permissions:
+  contents: write
+
 jobs:
   build-backend:
     name: Build And Push Backend
