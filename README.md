@@ -34,13 +34,24 @@ Clone this repository and run the following command:
 docker-compose up -d
 ```
 
-### With Kubernetes
+### With Kubernetes and Helm
 
-You would need helm pre-installed. Clone this repository. Then run:
+You would need Helm pre-installed. 
+
+#### Option 1. Install from Reliza Registry:
 
 ```
-kubectl create ns rebom
-helm install rebom -n rebom helm/rebom
+helm repo add reliza https://registry.relizahub.com/chartrepo/library
+helm repo update
+helm upgrade --install --create-namespace rebom -n rebom reliza/rebom
+```
+
+#### Option 2. Install from local clone of this repository:
+
+Clone this repository. Then run:
+
+```
+helm upgrade --install --create-namespace rebom -n rebom helm/rebom
 ```
 
 ## References
