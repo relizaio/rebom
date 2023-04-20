@@ -1,4 +1,4 @@
-FROM node:16.14.0-alpine3.15
+FROM node:18-alpine3.17
 ARG CI_ENV=noci
 ARG GIT_COMMIT=git_commit_undefined
 ARG GIT_BRANCH=git_branch_undefined
