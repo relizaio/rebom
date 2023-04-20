@@ -43,6 +43,12 @@ kubectl create ns rebom
 helm install rebom -n rebom helm/rebom
 ```
 
+## References
+This project is mentioned in the following tutorials and external resources:
+
+1. [How To Spin Helm Ephemerals with Reliza Hub: Tutorial](https://worklifenotes.com/2023/04/19/how-to-spin-helm-ephemerals-with-reliza-hub-tutorial/)
+2. [CycloneDX Tool Center](https://cyclonedx.org/tool-center/)
+
 ## Developing Rebom
 
 You would need Docker and Node 16+. Visual Studio Code is recommended.
