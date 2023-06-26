@@ -22,5 +22,5 @@ appVersion: 0.1.0
 
 dependencies:
   - name: ecr-regcred
-    repository: "https://registry.relizahub.com/chartrepo/library"
-    version: 0.1.0
+    repository: "oci://registry.relizahub.com/library"
+    version: 0.1.2
