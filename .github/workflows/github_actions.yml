@@ -47,10 +47,9 @@ jobs:
         with:
           registry_username: ${{ secrets.DOCKER_LOGIN }}
           registry_password: ${{ secrets.DOCKER_TOKEN }}
-          registry_host: https://registry.relizahub.com/chartrepo/library
+          registry_host: https://registry.relizahub.com/library
           helm_chart_name: rebom
           reliza_api_id: ${{ secrets.RELIZA_API_ID }}
           reliza_api_key: ${{ secrets.RELIZA_API_KEY }}
           path: helm
-          registry_type: CHARTMUSEUM
           reliza_project_id: 4aa0e445-9f12-4c80-880a-f919c1761f6c
