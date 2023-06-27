@@ -41,9 +41,7 @@ You would need Helm pre-installed.
 #### Option 1. Install from Reliza Registry:
 
 ```
-helm repo add reliza https://registry.relizahub.com/chartrepo/library
-helm repo update
-helm upgrade --install --create-namespace rebom -n rebom reliza/rebom
+helm upgrade --install --create-namespace rebom -n rebom oci://registry.relizahub.com/library/rebom
 ```
 
 #### Option 2. Install from local clone of this repository:
