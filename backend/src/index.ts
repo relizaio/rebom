@@ -317,7 +317,7 @@ async function startApolloServer(typeDefs: any, resolvers: any) {
   })
 
   app.use(
-    bodyParser.json(),
+    bodyParser.json({limit: '10mb'}),
     expressMiddleware(server)
   )
 
