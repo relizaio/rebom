@@ -254,7 +254,7 @@ async function findBomViaSingleQuery(singleQuery: string): Promise<BomDto[]> {
 }
 
 function updateSearchObj(searchObject: SearchObject, queryPath: string, addParam: string) {
-  searchObject.queryText += `AND ${queryPath} = $${searchObject.paramId}`
+  searchObject.queryText += ` AND ${queryPath} = $${searchObject.paramId}`
   searchObject.queryParams.push(addParam)
   ++searchObject.paramId
 }
