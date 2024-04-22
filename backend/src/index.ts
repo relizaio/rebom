@@ -68,6 +68,7 @@ const typeDefs = gql`
     allBoms: [Bom]
     findBom(bomSearch: BomSearch): [Bom]
     bomById(id: ID): Object
+    mergeBoms(ids: [ID]!, group: String!, name: String!, version: String!): Object
   }
 
   type Mutation {
@@ -106,6 +107,13 @@ const typeDefs = gql`
     offset: Int
   }
 
+  input BomMerge {
+    ids: ID,
+    version: String,
+    name: String,
+    group: String
+  }
+
   scalar Object
   scalar DateTime
 `;
@@ -129,6 +137,14 @@ const resolvers = {
         retObj = byIdRows.rows[0].bom
       }
       return retObj
+    },
+    mergeBoms: async (parent: any, mergeInput: any) : Promise<Object| null> => {
+      let queryRes = await utils.runQuery(`select * from rebom.boms where uuid::text in ('` + mergeInput.ids.join('\',\'') + `')`) 
+      let boms = queryRes.rows as BomRecord[]
+      var mergedBom = null
+      if(boms.length)
+        mergedBom = mergeBoms(boms, mergeInput.group, mergeInput.name, mergeInput.version)
+      return mergedBom
     }
   },
   Mutation: {
@@ -325,4 +341,19 @@ async function startApolloServer(typeDefs: any, resolvers: any) {
   console.log(`🚀 Server ready at http://localhost:4000`);
 }
 
-startApolloServer(typeDefs, resolvers)
+async function mergeBoms(boms :BomRecord[], group: String, name: String, version: String): Promise<Object> {
+  const bomPaths: String[] = await utils.createTmpFiles(boms.map(bom => bom.bom))
+
+  const response: Object = await utils.shellExec('cyclonedx-cli', ['merge', 
+    '--output-format', 'json',
+    '--input-format', 'json',
+    '--group', group,
+    '--name', name,
+    '--version', version,
+    '--input-files', ...bomPaths
+  ])
+  utils.deleteTmpFiles(bomPaths)
+  return response
+}
+
+startApolloServer(typeDefs, resolvers)  
