@@ -2,7 +2,7 @@
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: web-ingressroute
+  name: {{ .Release.Name }}-rebom-web-ingressroute
   namespace: {{ .Release.Namespace }}
 spec:
   entryPoints:
@@ -11,15 +11,15 @@ spec:
   - match: Host(`{{ .Values.ingress.host}}`)
     kind: Rule
     services:
-    - name: {{ .Release.Name }}-frontend-service
+    - name: {{ .Release.Name }}-rebom-frontend-service
       port: 80
     middlewares:
-      - name: redirect
+      - name: {{ .Release.Name }}-rebom-redirect
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: websecure-ingressroute
+  name: {{ .Release.Name }}-rebom-websecure-ingressroute
   namespace: {{ .Release.Namespace }}
 spec:
   entryPoints:
@@ -28,7 +28,7 @@ spec:
   - match: Host(`{{ .Values.ingress.host}}`)
     kind: Rule
     services:
-    - name: {{ .Release.Name }}-frontend-service
+    - name: {{ .Release.Name }}-rebom-frontend-service
       port: 80
   tls:
     certResolver: le
@@ -36,7 +36,7 @@ spec:
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
-  name: redirect
+  name: {{ .Release.Name }}-rebom-redirect
   namespace: {{ .Release.Namespace }}
 spec:
   redirectScheme:

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-backend
+  name: {{ .Release.Name }}-rebom-backend
   namespace: {{ .Release.Namespace }}
   labels:
     name: rebom-backend
@@ -30,13 +30,13 @@ spec:
         image: {{ .Values.backend.image }}
         env:
         - name: POSTGRES_HOST
-          value: {{ .Release.Name }}-postgres
+          value: {{ .Release.Name }}-rebom-postgres
         - name: POSTGRES_PORT
           value: "5432"
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Release.Name }}-pgpassword
+              name: {{ .Release.Name }}-rebom-pgpassword
               key: password
         ports:
         - containerPort: 4000
@@ -51,13 +51,13 @@ spec:
         image: {{ .Values.flyway.image }}
         env:
         - name: POSTGRES_JDBC
-          value: jdbc:postgresql://{{ .Release.Name }}-postgres:5432/postgres
+          value: jdbc:postgresql://{{ .Release.Name }}-rebom-postgres:5432/postgres
         - name: POSTGRES_USER
           value: postgres
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Release.Name }}-pgpassword
+              name: {{ .Release.Name }}-rebom-pgpassword
               key: password
         command: ['/bin/sh', '-c', "/flyway/flyway -url=$POSTGRES_JDBC -user=$POSTGRES_USER -password=$POSTGRES_PASSWORD -defaultSchema=rebom -schemas=rebom migrate"]
         volumeMounts:

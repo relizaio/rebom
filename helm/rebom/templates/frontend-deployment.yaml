@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-frontend
+  name: {{ .Release.Name }}-rebom-frontend
   namespace: {{ .Release.Namespace }}
   labels:
     name: rebom-frontend
@@ -30,7 +30,7 @@ spec:
         image: {{ .Values.frontend.image }}
         env:
         - name: BACKEND_HOST
-          value: {{ .Release.Name }}-backend-service
+          value: {{ .Release.Name }}-rebom-backend-service
         - name: BACKEND_PORT
           value: "4000"
         ports:

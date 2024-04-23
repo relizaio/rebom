@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Release.Name }}-ingress
+  name: {{ .Release.Name }}-rebom-ingress
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "rebom.labels" . | nindent 4 }}
@@ -14,7 +14,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: {{ .Release.Name }}-frontend-service
+            name: {{ .Release.Name }}-rebom-frontend-service
             port:
               number: 80
 {{- end }}
