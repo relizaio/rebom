@@ -29,7 +29,6 @@ COPY package*.json ./
 RUN npm install && npm install -g ts-node
 COPY ./ .
 
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=true 
 LABEL git_commit $GIT_COMMIT
 LABEL git_branch $GIT_BRANCH
 LABEL ci_environment $CI_ENV
