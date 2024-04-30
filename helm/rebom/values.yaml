@@ -1,3 +1,4 @@
+enabled: true
 backend:
   image: registry.relizahub.com/library/rebom-backend
   replicaCount: 1
