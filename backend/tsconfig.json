@@ -8,7 +8,9 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "preserveConstEnums": true
+        "preserveConstEnums": true,
+        "outDir": "./dist",
+        "baseUrl": "./",
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules", "**/*.spec.ts"]

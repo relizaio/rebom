@@ -7,7 +7,8 @@
     "test": "test",
     "start": "ts-node src/index.ts",
     "js": "node src/index.js",
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "build": "tsc -p ./tsconfig.json" 
   },
   "repository": {
     "type": "git",

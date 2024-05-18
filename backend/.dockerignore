@@ -5,3 +5,4 @@ node_modules
 get_version_command
 get_version_exec
 reliza_command
+dist
