@@ -29,9 +29,18 @@ export type BomInput = {
         meta: string,
         bom: any,
         tags: Object
+        rebomOptions: any
     }
 }
 
+export type RebomOptions = {
+    group: string,
+    name: string, 
+    version: string,
+    bomSource: string,
+    tldOnly: boolean,
+    releaseId: string
+}
 export type BomSearch = {
     bomSearch: {
         serialNumber: string,

@@ -8,11 +8,11 @@ const typeDefs = gql`
     allBoms: [Bom]
     findBom(bomSearch: BomSearch): [Bom]
     bomById(id: ID): Object
-    mergeBoms(ids: [ID]!, group: String!, name: String!, version: String!): Object
+    mergeBoms(ids: [ID]!, rebomOptions: RebomOptions!): Object
   }
 
   type Mutation {
-    addBom(bomInput: BomInput): Bom
+    addBom(bomInput: BomInput!): Bom
   }
 
   type Bom {
@@ -34,6 +34,23 @@ const typeDefs = gql`
     meta: String
     bom: Object
     tags: Object
+    rebomOptions: RebomOptions
+  }
+
+  input RebomOptions {
+    name: String!
+    group: String!
+    version: String!
+    bomSource: String
+    tldOnly: Boolean
+    releaseId: ID
+  }
+
+  input RootComponentOverrideInput {
+    name: String!
+    group: String!
+    version: String!
+    bomSource: String!
   }
 
   input BomSearch {
