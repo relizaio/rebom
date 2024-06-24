@@ -2,7 +2,7 @@ export type BomRecord = {
     uuid: string,
     created_date: Date,
     last_updated_date: Date,
-    meta: string,
+    meta: RebomOptions,
     bom: any,
     tags: Object,
     organization: string,
@@ -13,7 +13,7 @@ export type BomDto = {
     uuid: string,
     createdDate: Date,
     lastUpdatedDate: Date,
-    meta: string,
+    meta: RebomOptions,
     bom: Object,
     tags: Object,
     organization: string,
@@ -26,21 +26,49 @@ export type BomDto = {
 
 export type BomInput = {
     bomInput: {
-        meta: string,
         bom: any,
-        tags: Object
-        rebomOptions: any
+        tags?: Object,
+        rebomOptions: RebomOptions
     }
 }
 
-export type RebomOptions = {
-    group: string,
-    name: string, 
-    version: string,
-    bomSource: string,
-    tldOnly: boolean,
-    releaseId: string
+export type RebomMeta = {
+    relizaType: string,
+
+    
 }
+export type RebomOptions = {
+    name: string,
+    group: string,
+    version: string,
+    rebomType: string, // rebomType = application and hash = null || rebomType = '' = a cross merged bom
+    hash?: string,
+    notes: string,
+    tldOnly: boolean,
+    structure: string,
+    bomState: String, //[raw, merged, cross-merged]
+}
+
+// export type RebomOverride = {
+//     name: string,
+//     group: string,
+//     version: string,
+    
+//     rebomType: string,
+//     hash?: string,
+
+
+//     tldOnly: boolean,
+//     structure: string,
+//     bomState: String, [raw. merged, cross-merged]
+//   }
+
+// export type RebomMergeOptions = {
+//     rebomType: string,
+//     tldOnly: boolean,
+//     structure: string,
+//     hash?: string
+//   }
 export type BomSearch = {
     bomSearch: {
         serialNumber: string,
@@ -54,11 +82,13 @@ export type BomSearch = {
     }
 }
 
-export type SearchObject = {
+export type SearchObject = {    
     queryText: string,
     queryParams: string[],
     paramId: number
 }
+
+export const HIERARCHICHAL = 'hierarchical'
 
 export function bomRecordToDto(bomRecord: BomRecord): BomDto {
     let version = ''
