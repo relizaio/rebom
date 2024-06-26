@@ -246,7 +246,7 @@
   }
 
   function generatePurl(rebomOverride: RebomOptions): string {
-    return `pkg:reliza/${rebomOverride.group}/${rebomOverride.name}@${rebomOverride.version}` + (rebomOverride.rebomType ? `?rebomType=${rebomOverride.rebomType}` : '') + (rebomOverride.hash ? `&hash=${rebomOverride.hash}` : '') 
+    return `pkg:reliza/${rebomOverride.group}/${rebomOverride.name}@${rebomOverride.version}` + (rebomOverride.rebomType ? `?rebomType=${rebomOverride.rebomType}` : '') + (rebomOverride.hash ? `&hash=${rebomOverride.hash}` : '') + (rebomOverride.tldOnly ? `&tldOnly=${rebomOverride.tldOnly}` : '') 
   }
 
   function rootComponentOverride(bom: any, rebomOverride: RebomOptions): any {

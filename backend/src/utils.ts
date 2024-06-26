@@ -47,7 +47,7 @@ export async function shellExec(cmd: string, args: any[], timeout?: number): Pro
       })
 
       child.on('exit', (code: number) => {
-          if (code !== 0) console.log(`shell process exited with code ${code}`)
+          if (code !== 0) console.error(`shell process exited with code ${code}`)
           if (code === 0) {
               if (resData) {
                   resData = resData.replace(/\n$/, "")
