@@ -246,7 +246,8 @@
   }
 
   function generatePurl(rebomOverride: RebomOptions): string {
-    return `pkg:reliza/${rebomOverride.group}/${rebomOverride.name}@${rebomOverride.version}` + (rebomOverride.rebomType ? `?rebomType=${rebomOverride.rebomType}` : '') + (rebomOverride.hash ? `&hash=${rebomOverride.hash}` : '') + (rebomOverride.tldOnly ? `&tldOnly=${rebomOverride.tldOnly}` : '') 
+    let purl = `pkg:reliza/${rebomOverride.group}/${rebomOverride.name}@${rebomOverride.version}` + (rebomOverride.rebomType ? `?rebomType=${rebomOverride.rebomType}` : '') + (rebomOverride.hash ? `&hash=${rebomOverride.hash}` : '') + (rebomOverride.tldOnly ? `&tldOnly=${rebomOverride.tldOnly}` : '') + (rebomOverride.structure.toLowerCase() === HIERARCHICHAL.toLowerCase() ? `&structure=${HIERARCHICHAL}` : '') 
+    return purl
   }
 
   function rootComponentOverride(bom: any, rebomOverride: RebomOptions): any {
@@ -269,7 +270,7 @@
     if(rootdepIndex > -1)
       newBom.dependencies[rootdepIndex]['ref'] = newPurl
     else
-      console.error('root dependecy not found ! - rebomOverride: ', rebomOverride, '\nserialNumber:', bom.serialNumber)
+      console.error('root dependecy not found ! - rootComponentPurl:', rootComponentPurl ,' rebomOverride: ', rebomOverride, '\nserialNumber:', bom.serialNumber)
     const finalBom = Object.assign(bom, newBom)
     return finalBom
   }
