@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: RelizaHub Build And Submit Release metadata action
-        uses: relizaio/reliza-docker-action@master
+        uses: relizaio/reliza-docker-action@2.1
         with:
           registry_username: ${{ secrets.DOCKER_LOGIN }}
           registry_password: ${{ secrets.DOCKER_TOKEN }}
@@ -22,12 +22,13 @@ jobs:
           reliza_api_key: ${{ secrets.RELIZA_API_KEY }}
           path: backend
           reliza_project_id: 116bbe7f-35ea-4554-bbde-3845059961d5
+          enable_sbom: 'true'
   build-frontend:
     name: Build And Push Frontend
     runs-on: ubuntu-latest
     steps:
       - name: RelizaHub Build And Submit Release metadata action
-        uses: relizaio/reliza-docker-action@master
+        uses: relizaio/reliza-docker-action@2.1
         with:
           registry_username: ${{ secrets.DOCKER_LOGIN }}
           registry_password: ${{ secrets.DOCKER_TOKEN }}
@@ -38,6 +39,7 @@ jobs:
           reliza_api_key: ${{ secrets.RELIZA_API_KEY }}
           path: frontend
           reliza_project_id: a77887b8-2095-46ce-851f-47c72eca863b
+          enable_sbom: 'true'
   build-helm:
     name: Build And Push Helm Chart
     runs-on: ubuntu-latest
