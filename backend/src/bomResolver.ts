@@ -1,5 +1,5 @@
-import { BomDto, BomInput, BomRecord, BomSearch, SearchObject, bomRecordToDto } from './types';
 import * as BomService from './bomService';
+import { BomDto, BomInput, BomRecord, BomSearch } from './types';
 // A map of functions which return data for the schema.
 const resolvers = {
 	Query: {

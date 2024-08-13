@@ -1,21 +1,50 @@
-  import { BomDto, BomInput, BomRecord, BomSearch, HIERARCHICHAL, RebomOptions, SearchObject, bomRecordToDto } from './types';
+import * as BomRepository from './bomRespository';
+import { fetchFromOci, pushToOci } from './ociService';
+import { BomDto, BomInput, BomRecord, BomSearch, HIERARCHICHAL, RebomOptions, SearchObject } from './types';
+import validateBom from './validateBom';
   const utils = require('./utils')
-  import * as BomRepository from './bomRespository'
-  import validateBom from './validateBom';
 
+  async function bomRecordToDto(bomRecord: BomRecord): Promise<BomDto> {
+    let version = ''
+    let group = ''
+    let name = ''
+    let bomVersion = ''
+    if(!bomRecord.bom && process.env.OCI_STORAGE_ENABLED){
+      bomRecord.bom = fetchFromOci(bomRecord.meta.serialNumber)
+    }
+    if (bomRecord.bom) bomVersion = bomRecord.bom.version
+    if (bomRecord.bom && bomRecord.bom.metadata && bomRecord.bom.metadata.component) {
+        version = bomRecord.bom.metadata.component.version
+        name = bomRecord.bom.metadata.component.name
+        group = bomRecord.bom.metadata.component.group
+    }
+    let bomDto: BomDto = {
+        uuid: bomRecord.uuid,
+        createdDate: bomRecord.created_date,
+        lastUpdatedDate: bomRecord.last_updated_date,
+        meta: bomRecord.meta,
+        bom: bomRecord.bom,
+        tags: bomRecord.tags,
+        organization: bomRecord.organization,
+        public: bomRecord.public,
+        bomVersion: bomVersion,
+        group: group,
+        name: name,
+        version: version,
+    }
+    return bomDto
+}
 
   export async function findAllBoms(): Promise<BomDto[]> {
     let bomRecords = await BomRepository.findAllBoms();
-    return bomRecords.map(b => bomRecordToDto(b))
+    return await Promise.all(bomRecords.map(async(b) => bomRecordToDto(b)))
   }
 
   export async function findBomObjectById(id: string): Promise<Object> {
-    let retObj = {}
-    let bomsById = await BomRepository.bomById(id)
-    if (bomsById && bomsById.length && bomsById[0]) {
-      retObj = bomsById[0].bom
-    }
-    return retObj
+    let bomById = (await BomRepository.bomById(id))[0]
+    let bomDto = await bomRecordToDto(bomById)
+    
+    return bomDto.bom
   }
 
   export async function findBom(bomSearch: BomSearch): Promise<BomDto[]> {
@@ -50,7 +79,7 @@
 
       let queryRes = await utils.runQuery(searchObject.queryText, searchObject.queryParams)
       let bomRecords = queryRes.rows as BomRecord[]
-      bomDtos = bomRecords.map(b => bomRecordToDto(b))
+      bomDtos = await  Promise.all(bomRecords.map(async(b) => bomRecordToDto(b)))
     }
     return bomDtos
   }
@@ -63,7 +92,7 @@
     let queryRes = await utils.runQuery(queryText, values)
     let bomRecords = queryRes.rows as BomRecord[]
     if(bomRecords.length)
-      bomDtos = bomRecords.map(b => bomRecordToDto(b))
+      bomDtos = await Promise.all(bomRecords.map(async(b) => bomRecordToDto(b)))
     
     return bomDtos
   }
@@ -99,7 +128,7 @@
     }
 
     let bomRecords = queryRes.rows as BomRecord[]
-    return bomRecords.map(b => bomRecordToDto(b))
+    return await Promise.all(bomRecords.map(async(b) => bomRecordToDto(b)))
   }
 
   export function updateSearchObj(searchObject: SearchObject, queryPath: string, addParam: string) {
@@ -281,17 +310,23 @@
     bomObj = rootComponentOverride(bomObj, bomInput.bomInput.rebomOptions)
 
     let proceed: boolean = await validateBom(bomObj)
-
+    bomInput.bomInput.rebomOptions.serialNumber = bomObj.serialNumber
+    let serialNo = bomObj.serialNumber
+   
+    if(process.env.OCI_STORAGE_ENABLED){
+      pushToOci(serialNo, bomObj)
+      bomObj = null
+    }
 
     // urn must be unique - if same urn is supplied, we update current record
     // similarly it works for version, component group, component name, component version
     // check if urn is set on bom
     let queryText = 'INSERT INTO rebom.boms (meta, bom, tags) VALUES ($1, $2, $3) RETURNING *'
     let queryParams = [bomInput.bomInput.rebomOptions, bomObj, bomInput.bomInput.tags]
-    if (bomObj.serialNumber) {
+    if (serialNo) {
       let bomSearch: BomSearch = {
         bomSearch: {
-          serialNumber: bomObj.serialNumber as string,
+          serialNumber: serialNo as string,
           version: '',
           componentVersion: '',
           componentGroup: '',
