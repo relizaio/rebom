@@ -87,6 +87,16 @@ npm start
 
 Backend will be listening on localhost, port 4000.
 
+#### Configure OCI Repo
+Set the following ENV to enable oci repository
+
+```
+export OCI_STORAGE_ENABLED=true
+export OCI_ARTIFACT_SERVICE_HOST=http://localhost:8083
+export OCIARTIFACTS_REGISTRY_HOST=<registry_host_without_trailing_slash>
+export OCIARTIFACTS_REGISTRY_NAMESPACE=<registry_namespace_without_trailing_slash>
+```
+
 4. Run frontend:
 
 Frontend is a Vue 3 project.

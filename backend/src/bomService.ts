@@ -280,15 +280,20 @@ import validateBom from './validateBom';
   }
 
   function rootComponentOverride(bom: any, rebomOverride: RebomOptions): any {
+    // early return if no override
+    if(!rebomOverride)
+      return bom
+    
     let newBom: any = {}
     let rootComponentPurl: string = decodeURIComponent(bom.metadata.component.purl)
+    
     //generate purl
     let newPurl = generatePurl(rebomOverride)
 
     newBom.metadata = bom.metadata
     newBom.metadata.component.purl = newPurl
     newBom.metadata.component['bom-ref'] = newPurl
-    newBom.metadata.component['name'] = rebomOverride.name
+    newBom.metadata.component['name'] = rebomOverride.name 
     newBom.metadata.component['version'] = rebomOverride.version
     newBom.metadata.component['type'] = rebomOverride.rebomType?.toLowerCase() ?? 'application'
     newBom.metadata.component['group'] = rebomOverride.group
@@ -310,23 +315,23 @@ import validateBom from './validateBom';
     bomObj = rootComponentOverride(bomObj, bomInput.bomInput.rebomOptions)
 
     let proceed: boolean = await validateBom(bomObj)
-    bomInput.bomInput.rebomOptions.serialNumber = bomObj.serialNumber
-    let serialNo = bomObj.serialNumber
-   
+    let rebomOptions = bomInput.bomInput.rebomOptions ?? {}
+    rebomOptions.serialNumber = bomObj.serialNumber
+      
     if(process.env.OCI_STORAGE_ENABLED){
-      pushToOci(serialNo, bomObj)
-      bomObj = null
+      bomObj = await pushToOci(rebomOptions.serialNumber, bomObj)
+      // bomObj = null
     }
 
     // urn must be unique - if same urn is supplied, we update current record
     // similarly it works for version, component group, component name, component version
     // check if urn is set on bom
     let queryText = 'INSERT INTO rebom.boms (meta, bom, tags) VALUES ($1, $2, $3) RETURNING *'
-    let queryParams = [bomInput.bomInput.rebomOptions, bomObj, bomInput.bomInput.tags]
-    if (serialNo) {
+    let queryParams = [rebomOptions, bomObj, bomInput.bomInput.tags]
+    if (rebomOptions.serialNumber) {
       let bomSearch: BomSearch = {
         bomSearch: {
-          serialNumber: serialNo as string,
+          serialNumber: rebomOptions.serialNumber as string,
           version: '',
           componentVersion: '',
           componentGroup: '',
@@ -341,12 +346,12 @@ import validateBom from './validateBom';
 
       // if not found, re-try search by meta
       if (!bomRecord || !bomRecord.length)
-        bomRecord = await findBomByMeta(bomInput.bomInput.rebomOptions)
+        bomRecord = await findBomByMeta(rebomOptions)
       
 
       if (bomRecord && bomRecord.length && bomRecord[0].uuid) {
         queryText = 'UPDATE rebom.boms SET meta = $1, bom = $2, tags = $3 WHERE uuid = $4 RETURNING *'
-        queryParams = [bomInput.bomInput.rebomOptions, bomObj, bomInput.bomInput.tags, bomRecord[0].uuid]
+        queryParams = [rebomOptions, bomObj, bomInput.bomInput.tags, bomRecord[0].uuid]
       }
     }
 

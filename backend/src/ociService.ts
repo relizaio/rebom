@@ -27,27 +27,33 @@ export async function fetchFromOci(tag: string): Promise<Object>{
     return bom
 }
 
-export async function pushToOci(tag: string, bom: any): Promise<any>{
+interface OciResponse {
+    mediaType?: string,
+    digest?: string,
+    size?: string,
+    artifactType?: string
+}
+
+export async function pushToOci(tag: string, bom: any): Promise<OciResponse>{
     if(tag.startsWith("urn")){
         tag = tag.replace("urn:uuid:","")
     }
-    let resp: any = {}
+    let resp: OciResponse = {}
     const formData = new FormData();
     formData.append('registry', registryHost)
     formData.append('repo', repository)
     formData.append('tag', tag)
     const jsonBuffer = Buffer.from(JSON.stringify(bom));
     formData.append('file', jsonBuffer, 'file.json')
-    
     try {
         const response = await client.post('/push', formData, {
             headers: {
             ...formData.getHeaders(),
             },
         });
-        resp = response
+        resp = response.data
         } catch (error) {
             console.error(`Error sending request: ${error}`);
         }
-    return resp.data
+    return resp
 }
