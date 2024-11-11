@@ -9,7 +9,7 @@ import validateBom from './validateBom';
     let group = ''
     let name = ''
     let bomVersion = ''
-    if(!bomRecord.bom && process.env.OCI_STORAGE_ENABLED){
+    if(process.env.OCI_STORAGE_ENABLED){
       bomRecord.bom = fetchFromOci(bomRecord.meta.serialNumber)
     }
     if (bomRecord.bom) bomVersion = bomRecord.bom.version
@@ -43,7 +43,7 @@ import validateBom from './validateBom';
   export async function findBomObjectById(id: string): Promise<Object> {
     let bomById = (await BomRepository.bomById(id))[0]
     let bomDto = await bomRecordToDto(bomById)
-    
+    console.log("bom by ID:", bomDto)
     return bomDto.bom
   }
 
@@ -320,6 +320,7 @@ import validateBom from './validateBom';
       
     if(process.env.OCI_STORAGE_ENABLED){
       bomObj = await pushToOci(rebomOptions.serialNumber, bomObj)
+      console.log("push to oci rsp: ", bomObj)
       // bomObj = null
     }
 
