@@ -39,6 +39,14 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}-rebom-pgpassword
               key: password
+        - name: OCI_STORAGE_ENABLED
+          value: {{ .Values.backend.oci.enabled }}
+        - name: OCI_ARTIFACT_SERVICE_HOST
+          value: {{ .Values.backend.oci.serviceHost }}
+        - name: OCIARTIFACTS_REGISTRY_HOST
+          value: {{ .Values.backend.oci.registryHost }}
+        - name: OCIARTIFACTS_REGISTRY_NAMESPACE
+          value: {{ .Values.backend.oci.registryNamespace }}
         ports:
         - containerPort: 4000
       initContainers:

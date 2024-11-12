@@ -3,6 +3,11 @@ backend:
   image: registry.relizahub.com/library/rebom-backend
   replicaCount: 1
   regcred: none
+  oci:
+    enabled: false
+    serviceHost: http://[::1]:8083/
+    registryHost: registry
+    registryNamespace: namespace
 frontend:
   image: registry.relizahub.com/library/rebom-frontend
   replicaCount: 1
