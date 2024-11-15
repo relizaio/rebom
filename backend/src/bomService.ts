@@ -172,10 +172,10 @@ import validateBom from './validateBom';
   }
 
   async function findBomsForMerge(ids: string[], tldOnly: boolean) {
-    let bomRecords = await BomRepository.bomsByIds(ids)
+    let bomRecords =  await  Promise.all(ids.map(async(id) => findBomObjectById(id)))
     let bomObjs: any[] = []
     if (bomRecords && bomRecords.length) {
-      bomObjs = bomRecords.map(bomRecord => tldOnly ? extractTldFromBom(bomRecord.bom) : bomRecord.bom)
+      bomObjs = bomRecords.map(bomRecord => tldOnly ? extractTldFromBom(bomRecord) : bomRecord)
     }
     return bomObjs
   }
@@ -317,10 +317,8 @@ import validateBom from './validateBom';
     let proceed: boolean = await validateBom(bomObj)
     let rebomOptions = bomInput.bomInput.rebomOptions ?? {}
     rebomOptions.serialNumber = bomObj.serialNumber
-      
     if(process.env.OCI_STORAGE_ENABLED){
       bomObj = await pushToOci(rebomOptions.serialNumber, bomObj)
-      console.log("push to oci rsp: ", bomObj)
       // bomObj = null
     }
 
@@ -357,7 +355,8 @@ import validateBom from './validateBom';
     }
 
     let queryRes = await utils.runQuery(queryText, queryParams)
-    return queryRes.rows[0]
+    const bomReturned = queryRes.rows[0]
+    return bomReturned
   }
 
 
