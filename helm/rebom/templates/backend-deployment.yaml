@@ -40,7 +40,7 @@ spec:
               name: {{ .Release.Name }}-rebom-pgpassword
               key: password
         - name: OCI_STORAGE_ENABLED
-          value: {{ .Values.backend.oci.enabled }}
+          value: {{ .Values.backend.oci.enabled | quote }}
         - name: OCI_ARTIFACT_SERVICE_HOST
           value: {{ .Values.backend.oci.serviceHost }}
         - name: OCIARTIFACTS_REGISTRY_HOST
