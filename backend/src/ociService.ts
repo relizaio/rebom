@@ -45,6 +45,8 @@ export async function pushToOci(tag: string, bom: any): Promise<OciResponse>{
     formData.append('tag', tag)
     const jsonBuffer = Buffer.from(JSON.stringify(bom));
     formData.append('file', jsonBuffer, 'file.json')
+    console.log('client before sending request', client)
+    console.log('formData before sending request', formData)
     try {
         const response = await client.post('/push', formData, {
             headers: {
