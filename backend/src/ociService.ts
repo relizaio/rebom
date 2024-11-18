@@ -54,6 +54,7 @@ export async function pushToOci(tag: string, bom: any): Promise<OciResponse>{
             },
         });
         resp = response.data
+        console.log('response from oci service: ', response)
         } catch (error) {
             console.error(`Error sending request: ${error}`);
         }
