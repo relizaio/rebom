@@ -43,7 +43,6 @@ import validateBom from './validateBom';
   export async function findBomObjectById(id: string): Promise<Object> {
     let bomById = (await BomRepository.bomById(id))[0]
     let bomDto = await bomRecordToDto(bomById)
-    console.log("bom by ID:", bomDto)
     return bomDto.bom
   }
 
