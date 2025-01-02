@@ -37,9 +37,12 @@
     "graphql": "^16.6.0",
     "graphql-tag": "^2.12.6",
     "pg": "^8.11.0",
+    "pino": "^9.6.0",
+    "pino-pretty": "^13.0.0",
     "typescript": "^5.0.4"
   },
   "devDependencies": {
-    "@tsconfig/recommended": "^1.0.2"
+    "@tsconfig/recommended": "^1.0.2",
+    "@types/pino": "^7.0.5"
   }
 }

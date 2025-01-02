@@ -7,6 +7,7 @@ import bodyParser from 'body-parser';
 import router from './routes';
 import typeDefs from './schema.graphql'
 import resolvers from './bomResolver';
+import { logger } from './logger';
 
 
 async function startApolloServer(typeDefs: any, resolvers: any) {
@@ -18,7 +19,7 @@ async function startApolloServer(typeDefs: any, resolvers: any) {
     typeDefs,
     resolvers,
     formatError: (err) => {
-      console.error(err);
+      logger.error(err);
       return err;
     },
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
@@ -26,7 +27,7 @@ async function startApolloServer(typeDefs: any, resolvers: any) {
   await server.start();
 
   const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
-    console.error(err.stack);
+    logger.error(err.stack);
     res.status(500).send('Something broke!');
   };
 
@@ -38,7 +39,7 @@ async function startApolloServer(typeDefs: any, resolvers: any) {
   )
 
   await new Promise<void>(resolve => httpServer.listen({ port: 4000 }, resolve));
-  console.log(`🚀 Server ready at http://localhost:4000`);
+  logger.info(`🚀 Server ready at http://localhost:4000`);
 }
 
 startApolloServer(typeDefs, resolvers)  

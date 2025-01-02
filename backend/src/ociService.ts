@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import FormData from 'form-data';
+import { logger } from './logger';
 
 const client = axios.create({
     baseURL: process.env.OCI_ARTIFACT_SERVICE_HOST ? process.env.OCI_ARTIFACT_SERVICE_HOST : `http://[::1]:8083/`,
@@ -53,7 +54,7 @@ export async function pushToOci(tag: string, bom: any): Promise<OciResponse>{
         });
         resp = response.data
         } catch (error) {
-            console.error(`Error sending request: ${error}`);
+            logger.error(`Error sending request: ${error}`);
         }
     return resp
 }

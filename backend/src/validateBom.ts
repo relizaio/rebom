@@ -1,4 +1,5 @@
 import * as CDX from '@cyclonedx/cyclonedx-library'
+import { logger } from './logger';
 
 interface ValidatorMap {
     [key: string]: CDX.Validation.Types.Validator;
@@ -25,7 +26,7 @@ export default async function validateBom(data: any): Promise<boolean> {
         if (err instanceof CDX.Validation.MissingOptionalDependencyError) {
             console.info('JSON validation skipped:', err)
         } else {
-            console.error(err)
+            logger.error(err)
             throw err
         }
     }

@@ -3,6 +3,7 @@ const { spawn } = require('node:child_process')
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
+import { logger } from './logger';
 
 // init db
 const pool = new pg.Pool({
@@ -23,7 +24,7 @@ export async function runQuery (query: string, params: string[]) : Promise<any> 
       return await client.query(query, params)
     
     } catch (error) {
-      console.error("Error running query: ", error)
+      logger.error("Error running query: ", error)
     }
      finally {
       // Make sure to release the client before any error handling,
@@ -43,18 +44,18 @@ export async function shellExec(cmd: string, args: any[], timeout?: number): Pro
       })
     
       child.stderr.on('data', (data: any) => {
-          console.error(`shell command error: ${data}`)
+          logger.error(`shell command error: ${data}`)
       })
 
       child.on('exit', (code: number) => {
-          if (code !== 0) console.error(`shell process exited with code ${code}`)
+          if (code !== 0) logger.error(`shell process exited with code ${code}`)
           if (code === 0) {
               if (resData) {
                   resData = resData.replace(/\n$/, "")
               }
               resolve(resData)
           } else {
-              console.error(resData)
+              logger.error(resData)
               reject(resData)
           }
       })

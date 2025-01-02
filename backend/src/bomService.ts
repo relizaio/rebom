@@ -1,4 +1,5 @@
 import * as BomRepository from './bomRespository';
+import { logger } from './logger';
 import { fetchFromOci, pushToOci } from './ociService';
 import { BomDto, BomInput, BomRecord, BomSearch, HIERARCHICHAL, RebomOptions, SearchObject } from './types';
 import validateBom from './validateBom';
@@ -10,8 +11,10 @@ import validateBom from './validateBom';
     let name = ''
     let bomVersion = ''
     if(process.env.OCI_STORAGE_ENABLED){
-      bomRecord.bom = fetchFromOci(bomRecord.meta.serialNumber)
+      bomRecord.bom = await fetchFromOci(bomRecord.meta.serialNumber)
     }
+    bomRecord.bom = rootComponentOverride(bomRecord.bom, bomRecord.meta)
+
     if (bomRecord.bom) bomVersion = bomRecord.bom.version
     if (bomRecord.bom && bomRecord.bom.metadata && bomRecord.bom.metadata.component) {
         version = bomRecord.bom.metadata.component.version
@@ -148,7 +151,7 @@ import validateBom from './validateBom';
         mergedBom = await mergeBomObjects(bomObjs, rebomOptions)
       return mergedBom
     } catch (e) {
-      console.error("Error During merge", e)
+      logger.error("Error During merge", e)
       throw e
     }
   }
@@ -165,13 +168,14 @@ import validateBom from './validateBom';
       let bomRecord = await addBom(bomInput)
       return bomRecord
     } catch (e) {
-      console.error("Error During merge", e)
+      logger.error("Error During merge", e)
       throw e
     }
   }
 
   async function findBomsForMerge(ids: string[], tldOnly: boolean) {
-    let bomRecords =  await  Promise.all(ids.map(async(id) => findBomObjectById(id)))
+    logger.info("findBomsForMerge: {}", ids)
+    let bomRecords =  await Promise.all(ids.map(async(id) => findBomObjectById(id)))
     let bomObjs: any[] = []
     if (bomRecords && bomRecords.length) {
       bomObjs = bomRecords.map(bomRecord => tldOnly ? extractTldFromBom(bomRecord) : bomRecord)
@@ -182,22 +186,23 @@ import validateBom from './validateBom';
 
 
   function extractTldFromBom(bom: any) {
+    logger.info("extractTldFromBom tld", bom)
     let newBom: any = {}
     let rootComponentPurl: string
     try {
       // const bomAuthor = bom.metadata.tools.components[0].name
       // if (bomAuthor !== 'cdxgen') {
-      //   console.error("Top level dependecy can be extracted only for cdxgen boms")
+      //   logger.error("Top level dependecy can be extracted only for cdxgen boms")
       //   throw new Error("Top level dependecy can be extracted only for cdxgen boms")
 
       // }
       rootComponentPurl = bom.metadata.component.purl
       if (!rootComponentPurl) {
-        console.error("Need root component purl to be defined to extract top level dependencies")
+        logger.error("Need root component purl to be defined to extract top level dependencies")
         throw new Error("Need root component purl to be defined to extract top level dependencies")
       }
     } catch (e) {
-      console.error(e)
+      logger.error(e)
       throw new Error("Top level dependecy can be extracted only for cdxgen boms")
     }
     let rootDepObj: any
@@ -209,6 +214,7 @@ import validateBom from './validateBom';
         newBom.dependencies[0] = rootDepObj
       }
     }
+    logger.info("root dep suc")
     const finalBom = Object.assign(bom, newBom)
     return finalBom
   }
@@ -250,7 +256,7 @@ import validateBom from './validateBom';
       return postMergeBom
 
     } catch (e) {
-      console.error("Error During merge", e)
+      logger.error("Error During merge", e)
       throw e
     }
 
@@ -269,7 +275,7 @@ import validateBom from './validateBom';
   function addMissingDependecyGraph(bomObj: any, dependencyMap: any){
     let deps = bomObj.dependencies
     // see if the dependencies graph has any info about root level
-    // console.log('deps', deps)
+    // logger.info('deps', deps)
 
   }
 
@@ -303,24 +309,27 @@ import validateBom from './validateBom';
     if(rootdepIndex > -1)
       newBom.dependencies[rootdepIndex]['ref'] = newPurl
     else
-      console.error('root dependecy not found ! - rootComponentPurl:', rootComponentPurl ,' rebomOverride: ', rebomOverride, '\nserialNumber:', bom.serialNumber)
+      logger.error(['root dependecy not found ! - rootComponentPurl:', rootComponentPurl ,' rebomOverride: ', rebomOverride, '\nserialNumber:', bom.serialNumber])
     const finalBom = Object.assign(bom, newBom)
     return finalBom
   }
 
   export async function addBom(bomInput: BomInput): Promise<BomRecord> {
     // preprocessing here
+    logger.info("add bom called")
     let bomObj = await processBomObj(bomInput.bomInput.bom)
-    bomObj = rootComponentOverride(bomObj, bomInput.bomInput.rebomOptions)
+    // bomObj = rootComponentOverride(bomObj, bomInput.bomInput.rebomOptions)
 
     let proceed: boolean = await validateBom(bomObj)
-    let rebomOptions = bomInput.bomInput.rebomOptions ?? {}
+    const rebomOptions : RebomOptions = bomInput.bomInput.rebomOptions ?? {}
     rebomOptions.serialNumber = bomObj.serialNumber
     if(process.env.OCI_STORAGE_ENABLED){
       bomObj = await pushToOci(rebomOptions.serialNumber, bomObj)
       // bomObj = null
+      rebomOptions.storage = 'oci'
     }
 
+    rebomOptions.mod = 'raw'
     // urn must be unique - if same urn is supplied, we update current record
     // similarly it works for version, component group, component name, component version
     // check if urn is set on bom
@@ -375,8 +384,7 @@ import validateBom from './validateBom';
       'git+https://github': 'ssh://git@github',
 
     })
-    // console.log("bom processed, validating ...")
-    // console.log('processedBom data keys: ', Object.keys(processedBom))
+  
 
     let proceed: boolean = await validateBom(processedBom)
     // const bomModel = new CDX.Models.Bom(bom) <- doesn't yet support deserialization
@@ -436,15 +444,15 @@ import validateBom from './validateBom';
   async function sanitizeBom(bom: any, patterns: Record<string, string>): Promise<any> {
     try {
       let jsonString = JSON.stringify(bom);
-      // console.log('jsonstring', jsonString)
+      // logger.info('jsonstring', jsonString)
       Object.entries(patterns).forEach(([search, replace]) => {
         jsonString = jsonString.replaceAll(search, replace);
-        // console.log('replaced', jsonString)
+        // logger.info('replaced', jsonString)
       });
       return JSON.parse(jsonString)
       // return bom
     } catch (e) {
-      console.error("Error sanitizing bom", e)
+      logger.error("Error sanitizing bom", e)
       throw new Error("Error sanitizing bom: " + e);
     }
   }

@@ -32,11 +32,6 @@ export type BomInput = {
     }
 }
 
-export type RebomMeta = {
-    relizaType: string,
-
-    
-}
 export type RebomOptions = {
     serialNumber: string,
     name: string,
@@ -48,6 +43,8 @@ export type RebomOptions = {
     tldOnly: boolean,
     structure: string,
     bomState: String, //[raw, merged, cross-merged]
+    mod: String, //[raw, rebom, user?]
+    storage: String, //[oci, db]
 }
 
 export type BomSearch = {

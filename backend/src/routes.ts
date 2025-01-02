@@ -1,4 +1,5 @@
 import express from 'express';
+import { logger } from './logger';
 const utils = require('./utils')
 
 const router = express.Router();
@@ -17,7 +18,7 @@ const router = express.Router();
         }
         res.send(retObj)
     } catch (error) {
-        console.error('Errored bom for id = ' + bomId)
+        logger.error('Errored bom for id = ' + bomId)
         res.statusCode = 404
         res.send('Bom not found')
     }
