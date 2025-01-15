@@ -5,7 +5,7 @@ import { BomDto, BomInput, BomRecord, BomSearch, HIERARCHICHAL, RebomOptions, Se
 import validateBom from './validateBom';
   const utils = require('./utils')
 
-  async function bomRecordToDto(bomRecord: BomRecord): Promise<BomDto> {
+  async function bomRecordToDto(bomRecord: BomRecord, rootOverride: boolean = true): Promise<BomDto> {
     let version = ''
     let group = ''
     let name = ''
@@ -13,7 +13,9 @@ import validateBom from './validateBom';
     if(process.env.OCI_STORAGE_ENABLED){
       bomRecord.bom = await fetchFromOci(bomRecord.meta.serialNumber)
     }
-    bomRecord.bom = rootComponentOverride(bomRecord.bom, bomRecord.meta)
+    
+    if(rootOverride)
+      bomRecord.bom = rootComponentOverride(bomRecord.bom, bomRecord.meta)
 
     if (bomRecord.bom) bomVersion = bomRecord.bom.version
     if (bomRecord.bom && bomRecord.bom.metadata && bomRecord.bom.metadata.component) {
@@ -46,6 +48,9 @@ import validateBom from './validateBom';
   export async function findBomObjectById(id: string): Promise<Object> {
     let bomById = (await BomRepository.bomById(id))[0]
     let bomDto = await bomRecordToDto(bomById)
+    // logger.info("writing to file bomrecord")
+    // await writeFileAsync("/home/r/work/reliza/rebom/boms/"+id+".byID.json", JSON.stringify(bomById))
+    // await writeFileAsync("/home/r/work/reliza/rebom/boms/"+id+".dto.json", JSON.stringify(bomDto))
     return bomDto.bom
   }
 
@@ -174,9 +179,10 @@ import validateBom from './validateBom';
   }
 
   async function findBomsForMerge(ids: string[], tldOnly: boolean) {
-    logger.info("findBomsForMerge: {}", ids)
+    logger.info(`findBomsForMerge: ${ids}`)
     let bomRecords =  await Promise.all(ids.map(async(id) => findBomObjectById(id)))
     let bomObjs: any[] = []
+    logger.info(`bomrecords found # ${bomRecords.length}`)
     if (bomRecords && bomRecords.length) {
       bomObjs = bomRecords.map(bomRecord => tldOnly ? extractTldFromBom(bomRecord) : bomRecord)
     }
@@ -186,7 +192,6 @@ import validateBom from './validateBom';
 
 
   function extractTldFromBom(bom: any) {
-    logger.info("extractTldFromBom tld", bom)
     let newBom: any = {}
     let rootComponentPurl: string
     try {
@@ -206,16 +211,23 @@ import validateBom from './validateBom';
       throw new Error("Top level dependecy can be extracted only for cdxgen boms")
     }
     let rootDepObj: any
+    logger.info(`Bom components length before tld extract: ${bom.components.length}`)
+    logger.info(`rootComponentPurl: ${rootComponentPurl}`)
     if (rootComponentPurl && bom.dependencies.length) {
       rootDepObj = bom.dependencies.find((dep: any) => dep.ref === rootComponentPurl)
+
       if (rootDepObj && rootDepObj.dependsOn.length && bom.components && bom.components.length) {
-        newBom.components = bom.components.filter((comp: any) => rootDepObj.dependsOn.includes(comp.purl))
+        newBom.components = bom.components.filter((comp: any) => {
+          return rootDepObj.dependsOn.includes(comp.purl)
+        })
         newBom.dependencies = []
         newBom.dependencies[0] = rootDepObj
       }
     }
-    logger.info("root dep suc")
+
     const finalBom = Object.assign(bom, newBom)
+    logger.info(`Bom components length FATER tld extract: ${finalBom.components.length}`)
+
     return finalBom
   }
 
@@ -291,10 +303,9 @@ import validateBom from './validateBom';
     
     let newBom: any = {}
     let rootComponentPurl: string = decodeURIComponent(bom.metadata.component.purl)
-    
     //generate purl
     let newPurl = generatePurl(rebomOverride)
-
+    logger.info(`generated purl: ${newPurl}`)
     newBom.metadata = bom.metadata
     newBom.metadata.component.purl = newPurl
     newBom.metadata.component['bom-ref'] = newPurl
@@ -304,8 +315,11 @@ import validateBom from './validateBom';
     newBom.metadata.component['group'] = rebomOverride.group
 
     newBom.dependencies = bom.dependencies
-
-    let rootdepIndex = bom.dependencies.findIndex((dep: any) => dep.ref === rootComponentPurl)
+    let rootdepIndex = bom.dependencies.findIndex((dep: any) => {
+      // logger.info(`processing bom deps | ref : ${dep.ref}`)
+      return dep.ref === rootComponentPurl
+    }
+    )
     if(rootdepIndex > -1)
       newBom.dependencies[rootdepIndex]['ref'] = newPurl
     else
@@ -316,7 +330,6 @@ import validateBom from './validateBom';
 
   export async function addBom(bomInput: BomInput): Promise<BomRecord> {
     // preprocessing here
-    logger.info("add bom called")
     let bomObj = await processBomObj(bomInput.bomInput.bom)
     // bomObj = rootComponentOverride(bomObj, bomInput.bomInput.rebomOptions)
 
@@ -354,7 +367,6 @@ import validateBom from './validateBom';
       // if not found, re-try search by meta
       if (!bomRecord || !bomRecord.length)
         bomRecord = await findBomByMeta(rebomOptions)
-      
 
       if (bomRecord && bomRecord.length && bomRecord[0].uuid) {
         queryText = 'UPDATE rebom.boms SET meta = $1, bom = $2, tags = $3 WHERE uuid = $4 RETURNING *'
@@ -418,7 +430,7 @@ import validateBom from './validateBom';
           out_components.push(component)
           purl_dedup_map[component.purl] = true
         } else {
-          console.info(`deduped comp by purl: ${component.purl}`)
+          logger.info(`deduped comp by purl: ${component.purl}`)
         }
       } else if ('name' in component && 'version' in component) {
         let nver: string = component.name + '_' + component.version
@@ -426,7 +438,7 @@ import validateBom from './validateBom';
           out_components.push(component)
           name_dedup_map[nver] = true
         } else {
-          console.info(`deduped comp by name: ${nver}`)
+          logger.info(`deduped comp by name: ${nver}`)
         }
       } else {
         out_components.push(component)
@@ -437,7 +449,7 @@ import validateBom from './validateBom';
       outBom.dependencies = bom.dependencies
     }
 
-    console.info(`Dedup reduced json from ${Object.keys(bom).length} to ${Object.keys(outBom).length}`)
+    logger.info(`Dedup reduced json from ${Object.keys(bom).length} to ${Object.keys(outBom).length}`)
     return outBom
   }
 

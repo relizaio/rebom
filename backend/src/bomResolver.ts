@@ -9,11 +9,12 @@ const resolvers = {
 		bomById: async (_:any, id: any): Promise<Object> => BomService.findBomObjectById(id.id),
 		mergeBoms: async (_:any, mergeInput: any): Promise<any> => {
 			return BomService.exportMergedBom(mergeInput.ids, mergeInput.rebomOptions)},
-		mergeAndStoreBoms: async (_:any, mergeInput: any): Promise<any> => {
-			return BomService.mergeAndStoreBoms(mergeInput.ids, mergeInput.rebomOptions)},
+		
 	},
 	Mutation: {
-		addBom: async (_:any, bomInput: BomInput): Promise<BomRecord> => BomService.addBom(bomInput)
+		addBom: async (_:any, bomInput: BomInput): Promise<BomRecord> => BomService.addBom(bomInput),
+		mergeAndStoreBoms: async (_:any, mergeInput: any): Promise<any> => {
+			return BomService.mergeAndStoreBoms(mergeInput.ids, mergeInput.rebomOptions)},
 	}
 }
 export default resolvers;

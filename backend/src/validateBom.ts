@@ -18,13 +18,13 @@ export default async function validateBom(data: any): Promise<boolean> {
 
         const validationErrors = await validator.validate(JSON.stringify(data))
         if (validationErrors === null) {
-            console.info('JSON valid')
+            logger.info('JSON valid')
         } else {
             throw new Error('JSON Validation Error:\n' + JSON.stringify(validationErrors))
         }
     } catch (err) {
         if (err instanceof CDX.Validation.MissingOptionalDependencyError) {
-            console.info('JSON validation skipped:', err)
+            logger.info('JSON validation skipped:', err)
         } else {
             logger.error(err)
             throw err

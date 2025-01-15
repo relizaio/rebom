@@ -9,11 +9,11 @@ const typeDefs = gql`
     findBom(bomSearch: BomSearch): [Bom]
     bomById(id: ID): Object
     mergeBoms(ids: [ID]!, rebomOptions: RebomOptions!): Object
-    mergeAndStoreBoms(ids: [ID]!, rebomOptions: RebomOptions!): Bom
   }
 
   type Mutation {
     addBom(bomInput: BomInput!): Bom
+    mergeAndStoreBoms(ids: [ID]!, rebomOptions: RebomOptions!): Bom
   }
 
   type Bom {

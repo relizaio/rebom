@@ -80,3 +80,13 @@ export async function deleteTmpFiles(filePaths: string[]): Promise<void> {
         await fs.promises.unlink(filePath);
     }
 }
+
+export async function writeFileAsync(filename: string, content: string): Promise<void> {
+    try {
+      await fs.promises.writeFile(filename, content);
+      console.log(`File ${filename} has been written successfully`);
+    } catch (error) {
+      console.error(`Error writing to file ${filename}:`, error);
+    }
+  }
+  
