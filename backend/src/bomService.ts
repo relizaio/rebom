@@ -193,7 +193,7 @@ import validateBom from './validateBom';
 
   function extractTldFromBom(bom: any) {
     let newBom: any = {}
-    let rootComponentPurl: string
+    let rootComponentRef: string
     try {
       // const bomAuthor = bom.metadata.tools.components[0].name
       // if (bomAuthor !== 'cdxgen') {
@@ -201,8 +201,8 @@ import validateBom from './validateBom';
       //   throw new Error("Top level dependecy can be extracted only for cdxgen boms")
 
       // }
-      rootComponentPurl = bom.metadata.component.purl
-      if (!rootComponentPurl) {
+      rootComponentRef = bom.metadata.component['bom-ref']
+      if (!rootComponentRef) {
         logger.error("Need root component purl to be defined to extract top level dependencies")
         throw new Error("Need root component purl to be defined to extract top level dependencies")
       }
@@ -212,13 +212,13 @@ import validateBom from './validateBom';
     }
     let rootDepObj: any
     logger.info(`Bom components length before tld extract: ${bom.components.length}`)
-    logger.info(`rootComponentPurl: ${rootComponentPurl}`)
-    if (rootComponentPurl && bom.dependencies.length) {
-      rootDepObj = bom.dependencies.find((dep: any) => dep.ref === rootComponentPurl)
+    logger.info(`rootComponentRef: ${rootComponentRef}`)
+    if (rootComponentRef && bom.dependencies.length) {
+      rootDepObj = bom.dependencies.find((dep: any) => dep.ref === rootComponentRef)
 
       if (rootDepObj && rootDepObj.dependsOn.length && bom.components && bom.components.length) {
         newBom.components = bom.components.filter((comp: any) => {
-          return rootDepObj.dependsOn.includes(comp.purl)
+          return rootDepObj.dependsOn.includes(comp["bom-ref"])
         })
         newBom.dependencies = []
         newBom.dependencies[0] = rootDepObj
@@ -302,7 +302,7 @@ import validateBom from './validateBom';
       return bom
     
     let newBom: any = {}
-    let rootComponentPurl: string = decodeURIComponent(bom.metadata.component.purl)
+    let rootComponentPurl: string = decodeURIComponent(bom.metadata.component["bom-ref"])
     //generate purl
     let newPurl = generatePurl(rebomOverride)
     logger.info(`generated purl: ${newPurl}`)
@@ -323,7 +323,7 @@ import validateBom from './validateBom';
     if(rootdepIndex > -1)
       newBom.dependencies[rootdepIndex]['ref'] = newPurl
     else
-      logger.error(['root dependecy not found ! - rootComponentPurl:', rootComponentPurl ,' rebomOverride: ', rebomOverride, '\nserialNumber:', bom.serialNumber])
+      logger.error(`root dependecy not found ! - rootComponentPurl:, ${rootComponentPurl}, \nrebomOverride:  ${rebomOverride}, \nserialNumber: ${bom.serialNumber}`)
     const finalBom = Object.assign(bom, newBom)
     return finalBom
   }
