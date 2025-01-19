@@ -150,8 +150,8 @@ import validateBom from './validateBom';
 
   export async function mergeBoms(ids: string[], rebomOptions: RebomOptions): Promise<any> {
     try {
-      var mergedBom = null
-      let bomObjs = await findBomsForMerge(ids, rebomOptions.tldOnly)
+      let mergedBom = null
+      const bomObjs = await findBomsForMerge(ids, rebomOptions.tldOnly)
       if (bomObjs && bomObjs.length)
         mergedBom = await mergeBomObjects(bomObjs, rebomOptions)
       return mergedBom
@@ -163,14 +163,14 @@ import validateBom from './validateBom';
 
   export async function mergeAndStoreBoms(ids: string[], rebomOptions: RebomOptions): Promise<any> {
     try {
-      let mergedBom = await  mergeBoms(ids, rebomOptions)
-      let bomInput : BomInput = {
+      const mergedBom = await mergeBoms(ids, rebomOptions)
+      const bomInput : BomInput = {
         bomInput: {
           rebomOptions: rebomOptions,
           bom: mergedBom,
         }
       }
-      let bomRecord = await addBom(bomInput)
+      const bomRecord = await addBom(bomInput)
       return bomRecord
     } catch (e) {
       logger.error("Error During merge", e)
@@ -241,8 +241,8 @@ import validateBom from './validateBom';
       
       
       const bomPaths: string[] = await utils.createTmpFiles(bomObjects)
-      let command = ['merge']
-      if(rebomOptions.structure.toUpperCase() ===  HIERARCHICHAL.toUpperCase()){
+      const command = ['merge']
+      if(rebomOptions.structure.toUpperCase() === HIERARCHICHAL.toUpperCase()){
         command.push('--hierarchical')
       }
       command.push(
@@ -257,13 +257,13 @@ import validateBom from './validateBom';
       const mergeResponse: string = await utils.shellExec('cyclonedx-cli',command)
       // utils.deleteTmpFiles(bomPaths)s
 
-      let jsonObj = JSON.parse(mergeResponse)
+      const jsonObj = JSON.parse(mergeResponse)
       jsonObj.metadata.tools = []
-      let processedBom = await processBomObj(jsonObj)
+      const processedBom = await processBomObj(jsonObj)
       // let bomRoots = bomObjects.map(bomObj => bomObj.metadata.component)
       // use the bom roots to prep the root level dep obj if doesn't already exist!
       // check if the root level dep obj is there?
-      let postMergeBom = postMergeOps(processedBom, rebomOptions)
+      const postMergeBom = postMergeOps(processedBom, rebomOptions)
       await validateBom(postMergeBom)
       return postMergeBom
 
@@ -276,7 +276,7 @@ import validateBom from './validateBom';
 
   function postMergeOps(bomObj: any, rebomOptions: RebomOptions): any {
     // set bom-ref and purl for the root mreged component + we would need somekinda identifiers as well?
-    let purl = generatePurl(rebomOptions)
+    const purl = generatePurl(rebomOptions)
     // bomObj.serialNumber = `urn:uuid:${rebomOptions.releaseId}`
     bomObj.metadata.component['bom-ref'] = purl
     bomObj.metadata.component['purl'] = purl
