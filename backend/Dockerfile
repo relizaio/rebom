@@ -2,7 +2,7 @@ FROM node:20-alpine3.18 as builder
 
 ARG TARGETARCH
 ARG TARGETOS
-ARG CYCLONE_DX_CLI_VERSION=v0.25.0
+ARG CYCLONE_DX_CLI_VERSION=v0.27.2
 
 RUN if [ "$TARGETARCH" = "amd64" ]; then \
         wget https://github.com/CycloneDX/cyclonedx-cli/releases/download/${CYCLONE_DX_CLI_VERSION}/cyclonedx-linux-musl-x64 ;\

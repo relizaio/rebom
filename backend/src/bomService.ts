@@ -248,6 +248,7 @@ import validateBom from './validateBom';
       command.push(
         '--output-format', 'json',
         '--input-format', 'json',
+        '--output-version', 'v1_6',
         '--group', rebomOptions.group,
         '--name', rebomOptions.name,
         '--version', rebomOptions.version,
