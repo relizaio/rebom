@@ -293,7 +293,7 @@ import validateBom from './validateBom';
   }
 
   function generatePurl(rebomOverride: RebomOptions): string {
-    let purl = `pkg:reliza/${rebomOverride.group}/${rebomOverride.name}@${rebomOverride.version}` + (rebomOverride.rebomType ? `?rebomType=${rebomOverride.rebomType}` : '') + (rebomOverride.hash ? `&hash=${rebomOverride.hash}` : '') + (rebomOverride.tldOnly ? `&tldOnly=${rebomOverride.tldOnly}` : '') + (rebomOverride.structure.toLowerCase() === HIERARCHICHAL.toLowerCase() ? `&structure=${HIERARCHICHAL}` : '') 
+    let purl = `pkg:reliza/${rebomOverride.group}/${rebomOverride.name}@${rebomOverride.version}` + (rebomOverride.belongsTo ? `?belongsTo=${rebomOverride.belongsTo}` : '') + (rebomOverride.hash ? `&hash=${rebomOverride.hash}` : '') + (rebomOverride.tldOnly ? `&tldOnly=${rebomOverride.tldOnly}` : '') + (rebomOverride.structure.toLowerCase() === HIERARCHICHAL.toLowerCase() ? `&structure=${HIERARCHICHAL}` : '') 
     return purl
   }
 
@@ -312,7 +312,7 @@ import validateBom from './validateBom';
     newBom.metadata.component['bom-ref'] = newPurl
     newBom.metadata.component['name'] = rebomOverride.name 
     newBom.metadata.component['version'] = rebomOverride.version
-    newBom.metadata.component['type'] = rebomOverride.rebomType?.toLowerCase() ?? 'application'
+    // newBom.metadata.component['type'] = rebomOverride.belongsTo?.toLowerCase() ?? 'application'
     newBom.metadata.component['group'] = rebomOverride.group
 
     newBom.dependencies = bom.dependencies

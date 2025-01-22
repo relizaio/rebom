@@ -46,7 +46,7 @@ const typeDefs = gql`
     group: String
     version: String
     hash: String
-    rebomType: String
+    belongsTo: String
     tldOnly: Boolean
     structure: String
     notes: String
@@ -56,11 +56,11 @@ const typeDefs = gql`
     name: String!
     group: String!
     version: String!
-    rebomType: String
+    belongsTo: String
     hash: String
   }
   input RebomMergeOptions {
-    rebomType: String
+    belongsTo: String
     tldOnly: Boolean!
     structure: String!
   }

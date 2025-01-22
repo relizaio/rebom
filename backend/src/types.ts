@@ -37,7 +37,7 @@ export type RebomOptions = {
     name: string,
     group: string,
     version: string,
-    rebomType: string, // rebomType = application and hash = null || rebomType = '' = a cross merged bom
+    belongsTo: string, // belongsTo = application and hash = null || belongsTo = '' = a cross merged bom
     hash?: string,
     notes: string,
     tldOnly: boolean,
