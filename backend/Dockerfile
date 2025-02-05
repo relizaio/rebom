@@ -1,4 +1,4 @@
-FROM node:20-alpine3.18 as builder
+FROM node:22-alpine3.21 as builder
 
 ARG TARGETARCH
 ARG TARGETOS
@@ -19,7 +19,7 @@ RUN npm i
 COPY ./ .
 RUN npm run build
 
-FROM node:20-alpine3.18 as package
+FROM node:22-alpine3.21 as package
 
 ARG CI_ENV=noci
 ARG GIT_COMMIT=git_commit_undefined
