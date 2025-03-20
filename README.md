@@ -8,6 +8,8 @@ Public demo is available at https://rebomdemo.relizahub.com .
 
 *N.B.* (!) Please note, that any boms uploaded to demo are publicly visible (!)
 
+Rebom is also a storage part of our larger product [ReARM](https://github.com/relizaio/rearm).
+
 
 ## Load SBOM to Rebom
 Download [Reliza CLI](https://github.com/relizaio/reliza-cli) for your platform.
