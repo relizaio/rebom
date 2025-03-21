@@ -3,6 +3,8 @@ import { logger } from './logger';
 import { fetchFromOci, pushToOci } from './ociService';
 import { BomDto, BomInput, BomRecord, BomSearch, HIERARCHICHAL, RebomOptions, SearchObject } from './types';
 import validateBom from './validateBom';
+const canonicalize = require ('canonicalize')
+import { createHash } from 'crypto';
   const utils = require('./utils')
 
   async function bomRecordToDto(bomRecord: BomRecord, rootOverride: boolean = true): Promise<BomDto> {
@@ -329,6 +331,30 @@ import validateBom from './validateBom';
     return finalBom
   }
 
+  // function computeSha
+  function computeBomDigest(bom: any): string {
+    // strip meta
+    let bomForDigest: any = {}
+    bomForDigest["components"] = bom["components"]
+    bomForDigest["dependencies"] = bom["dependencies"]
+    // canoncicalize
+    const canonBom = canonicalize(bomForDigest)
+
+    // compute digest
+    return computeSha256Hash(canonBom)
+  }
+
+  function computeSha256Hash(obj: string): string {
+    const spaces = 2
+    try {
+        const hash = createHash('sha256');
+        hash.update(obj);
+        return hash.digest('hex');
+    } catch (error) {
+        throw new Error(`Failed to compute hash: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
+
   export async function addBom(bomInput: BomInput): Promise<BomRecord> {
     // preprocessing here
     let bomObj = await processBomObj(bomInput.bomInput.bom)
@@ -337,47 +363,58 @@ import validateBom from './validateBom';
     let proceed: boolean = await validateBom(bomObj)
     const rebomOptions : RebomOptions = bomInput.bomInput.rebomOptions ?? {}
     rebomOptions.serialNumber = bomObj.serialNumber
-    if(process.env.OCI_STORAGE_ENABLED){
-      bomObj = await pushToOci(rebomOptions.serialNumber, bomObj)
-      // bomObj = null
-      rebomOptions.storage = 'oci'
-    }
-
-    rebomOptions.mod = 'raw'
-    // urn must be unique - if same urn is supplied, we update current record
-    // similarly it works for version, component group, component name, component version
-    // check if urn is set on bom
-    let queryText = 'INSERT INTO rebom.boms (meta, bom, tags) VALUES ($1, $2, $3) RETURNING *'
-    let queryParams = [rebomOptions, bomObj, bomInput.bomInput.tags]
-    if (rebomOptions.serialNumber) {
-      let bomSearch: BomSearch = {
-        bomSearch: {
-          serialNumber: rebomOptions.serialNumber as string,
-          version: '',
-          componentVersion: '',
-          componentGroup: '',
-          componentName: '',
-          singleQuery: '',
-          page: 0,
-          offset: 0
+    const bomSha: string = computeBomDigest(bomObj)
+    rebomOptions.bomDigest = bomSha
+    // find bom by digest
+    let bomRows: BomRecord[]
+    let bomRecord: BomRecord
+    bomRows = await BomRepository.bomByDigest(bomSha)
+    if (!bomRows || !bomRows.length){
+      if(process.env.OCI_STORAGE_ENABLED){
+        bomObj = await pushToOci(rebomOptions.serialNumber, bomObj)
+        rebomOptions.storage = 'oci'
+      }
+  
+      rebomOptions.mod = 'raw'
+      // urn must be unique - if same urn is supplied, we update current record
+      // similarly it works for version, component group, component name, component version
+      // check if urn is set on bom
+      let queryText = 'INSERT INTO rebom.boms (meta, bom, tags) VALUES ($1, $2, $3) RETURNING *'
+      let queryParams = [rebomOptions, bomObj, bomInput.bomInput.tags]
+      if (rebomOptions.serialNumber) {
+        let bomSearch: BomSearch = {
+          bomSearch: {
+            serialNumber: rebomOptions.serialNumber as string,
+            version: '',
+            componentVersion: '',
+            componentGroup: '',
+            componentName: '',
+            singleQuery: '',
+            page: 0,
+            offset: 0
+          }
+        }
+        // if bom record found then update, otherwise insert
+        let bomDtos = await findBom(bomSearch)
+  
+        // if not found, re-try search by meta
+        if (!bomDtos || !bomDtos.length)
+          bomDtos = await findBomByMeta(rebomOptions)
+  
+        if (bomDtos && bomDtos.length && bomDtos[0].uuid) {
+          queryText = 'UPDATE rebom.boms SET meta = $1, bom = $2, tags = $3 WHERE uuid = $4 RETURNING *'
+          queryParams = [rebomOptions, bomObj, bomInput.bomInput.tags, bomDtos[0].uuid]
         }
       }
-      // if bom record found then update, otherwise insert
-      let bomRecord = await findBom(bomSearch)
-
-      // if not found, re-try search by meta
-      if (!bomRecord || !bomRecord.length)
-        bomRecord = await findBomByMeta(rebomOptions)
-
-      if (bomRecord && bomRecord.length && bomRecord[0].uuid) {
-        queryText = 'UPDATE rebom.boms SET meta = $1, bom = $2, tags = $3 WHERE uuid = $4 RETURNING *'
-        queryParams = [rebomOptions, bomObj, bomInput.bomInput.tags, bomRecord[0].uuid]
-      }
+  
+      let queryRes = await utils.runQuery(queryText, queryParams)
+      bomRows = queryRes.rows
+      bomRecord = bomRows[0]
+    }else{
+      bomRecord = bomRows[0]
+      bomRecord.duplicate = true
     }
-
-    let queryRes = await utils.runQuery(queryText, queryParams)
-    const bomReturned = queryRes.rows[0]
-    return bomReturned
+    return bomRecord
   }
 
 

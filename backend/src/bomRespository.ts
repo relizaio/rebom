@@ -18,3 +18,9 @@ export async function bomsByIds(ids: string[]): Promise<BomRecord[]> {
     let boms = queryRes.rows as BomRecord[]
     return boms
 }
+
+export async function bomByDigest(digest: string): Promise<BomRecord[]> {
+    let queryRes = await utils.runQuery(`select * from rebom.boms where meta->>'bomDigest' = $1`, [digest])
+    let boms = queryRes.rows as BomRecord[]
+    return boms
+}

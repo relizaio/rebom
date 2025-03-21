@@ -32,6 +32,7 @@
     "ajv-formats": "^3.0.1",
     "ajv-formats-draft2019": "^1.6.1",
     "axios": "^1.7.3",
+    "canonicalize": "^2.0.0",
     "express": "^4.18.2",
     "form-data": "^4.0.0",
     "graphql": "^16.6.0",

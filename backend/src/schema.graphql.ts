@@ -29,6 +29,7 @@ const typeDefs = gql`
     group: String
     name: String
     version: String
+    duplicate: Boolean
   }
 
   input BomInput {

@@ -6,7 +6,8 @@ export type BomRecord = {
     bom: any,
     tags: Object,
     organization: string,
-    public: boolean
+    public: boolean,
+    duplicate: boolean,
 }
 
 export type BomDto = {
@@ -42,9 +43,10 @@ export type RebomOptions = {
     notes: string,
     tldOnly: boolean,
     structure: string,
-    bomState: String, //[raw, merged, cross-merged]
-    mod: String, //[raw, rebom, user?]
-    storage: String, //[oci, db]
+    bomState: string, //[raw, merged, cross-merged]
+    mod: string, //[raw, rebom, user?]
+    storage: string, //[oci, db]
+    bomDigest?: string,
 }
 
 export type BomSearch = {
