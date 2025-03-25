@@ -12,8 +12,8 @@ frontend:
   image: registry.relizahub.com/library/rebom-frontend
   replicaCount: 1
   regcred: none
-postgresql:
-  image: postgres:14.1
+postgres:
+  image: postgres:16
   defaultSecret: true
   replicaCount: 1
   storage: 5Gi

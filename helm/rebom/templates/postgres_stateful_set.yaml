@@ -12,7 +12,7 @@ spec:
       app: rebom
       name: postgres
       {{- include "rebom.selectorLabels" . | nindent 6 }}
-  replicas: {{ .Values.postgresql.replicaCount }}
+  replicas: {{ .Values.postgres.replicaCount }}
   serviceName: {{ .Release.Name }}-rebom-postgres
   template:
     metadata:
@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: postgres-container
-          image: {{ .Values.postgresql.image }}
+          image: {{ .Values.postgres.image }}
           env:
           - name: POSTGRES_PASSWORD
             valueFrom:
@@ -43,5 +43,5 @@ spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: {{ .Values.postgresql.storage }}
+            storage: {{ .Values.postgres.storage }}
 {{- end}}
