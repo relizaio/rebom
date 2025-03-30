@@ -297,7 +297,7 @@ import { createHash } from 'crypto';
   function generatePurl(rebomOverride: RebomOptions): string {
     const group = encodeURIComponent(rebomOverride.group)
     const name = encodeURIComponent(rebomOverride.name)
-    return `pkg:generic/${group}/${name}@${rebomOverride.version}` + (rebomOverride.belongsTo ? `?belongsTo=${rebomOverride.belongsTo}` : '') + (rebomOverride.hash ? `&hash=${rebomOverride.hash}` : '') + (rebomOverride.tldOnly ? `&tldOnly=${rebomOverride.tldOnly}` : '') + (rebomOverride.structure.toLowerCase() === HIERARCHICHAL.toLowerCase() ? `&structure=${HIERARCHICHAL}` : '') 
+    return `pkg:generic/${group}/${name}@${rebomOverride.version}?tool=rebom` + (rebomOverride.belongsTo ? `&belongsTo=${rebomOverride.belongsTo}` : '') + (rebomOverride.hash ? `&hash=${rebomOverride.hash}` : '') + (rebomOverride.tldOnly ? `&tldOnly=${rebomOverride.tldOnly}` : '') + (rebomOverride.structure.toLowerCase() === HIERARCHICHAL.toLowerCase() ? `&structure=${HIERARCHICHAL}` : '') 
   }
 
   function rootComponentOverride(bom: any, rebomOverride: RebomOptions): any {
