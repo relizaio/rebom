@@ -333,11 +333,28 @@ import { createHash } from 'crypto';
   }
 
   // function computeSha
-  function computeBomDigest(bom: any): string {
+  function computeBomDigest(bom: any, stripBom: boolean): string {
     // strip meta
     let bomForDigest: any = {}
-    bomForDigest["components"] = bom["components"]
-    bomForDigest["dependencies"] = bom["dependencies"]
+   
+    if(stripBom){
+      bomForDigest["components"] = bom["components"]
+      bomForDigest["dependencies"] = bom["dependencies"]
+      //strip version
+      const rootComponentPurl: string = bom.metadata.component["bom-ref"]
+      const versionStrippedRootComponentPurl = rootComponentPurl.split("@")[0]
+
+      let rootdepIndex = bomForDigest["dependencies"].findIndex((dep: any) => {
+        return dep.ref === rootComponentPurl
+      }
+      )
+      if(rootdepIndex > -1){
+        bomForDigest["dependencies"][rootdepIndex]['ref'] = versionStrippedRootComponentPurl
+      }
+    }else{
+      bomForDigest = bom
+    }
+   
     // canoncicalize
     const canonBom = canonicalize(bomForDigest)
 
@@ -364,7 +381,7 @@ import { createHash } from 'crypto';
     let proceed: boolean = await validateBom(bomObj)
     const rebomOptions : RebomOptions = bomInput.bomInput.rebomOptions ?? {}
     rebomOptions.serialNumber = bomObj.serialNumber
-    const bomSha: string = computeBomDigest(bomObj)
+    const bomSha: string = computeBomDigest(bomObj, rebomOptions.stripBom)
     rebomOptions.bomDigest = bomSha
     // find bom by digest
     let bomRows: BomRecord[]
