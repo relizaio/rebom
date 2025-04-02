@@ -47,7 +47,7 @@ export type RebomOptions = {
     mod: string, //[raw, rebom, user?]
     storage: string, //[oci, db]
     bomDigest?: string,
-    stripBom: boolean
+    stripBom: string
 
 }
 

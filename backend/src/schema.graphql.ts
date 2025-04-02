@@ -51,7 +51,7 @@ const typeDefs = gql`
     tldOnly: Boolean
     structure: String
     notes: String
-    stripBom: Boolean
+    stripBom: String
   }
 
   input RebomOverride {

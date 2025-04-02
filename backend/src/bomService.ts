@@ -333,11 +333,11 @@ import { createHash } from 'crypto';
   }
 
   // function computeSha
-  function computeBomDigest(bom: any, stripBom: boolean): string {
+  function computeBomDigest(bom: any, stripBom: string): string {
     // strip meta
     let bomForDigest: any = {}
    
-    if(stripBom){
+    if(stripBom === 'TRUE'){
       bomForDigest["components"] = bom["components"]
       bomForDigest["dependencies"] = bom["dependencies"]
       //strip version
