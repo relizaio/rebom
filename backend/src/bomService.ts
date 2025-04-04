@@ -353,7 +353,7 @@ function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions
       newBom.dependencies[rootdepIndex]['ref'] = newPurl
     else {
       logger.error(`root dependecy not found ! - rootComponentPurl: ${rootComponentPurl}, \nrebomOverride:  ${rebomOverride}, \nserialNumber: ${bom.serialNumber}`)
-      logger.info(newBom.dependencies[0].toString())
+      logger.info(JSON.stringify(newBom.dependencies))
     }
       
     const finalBom = Object.assign(bom, newBom)
