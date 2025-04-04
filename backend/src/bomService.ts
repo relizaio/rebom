@@ -17,7 +17,7 @@ import { createHash } from 'crypto';
     }
     
     if(rootOverride)
-      bomRecord.bom = rootComponentOverride(bomRecord.bom, bomRecord.meta)
+      bomRecord.bom = rootComponentOverride(bomRecord)
 
     if (bomRecord.bom) bomVersion = bomRecord.bom.version
     if (bomRecord.bom && bomRecord.bom.metadata && bomRecord.bom.metadata.component) {
@@ -300,15 +300,16 @@ import { createHash } from 'crypto';
     return `pkg:generic/${group}/${name}@${rebomOverride.version}?tool=rebom` + (rebomOverride.belongsTo ? `&belongsTo=${rebomOverride.belongsTo}` : '') + (rebomOverride.hash ? `&hash=${rebomOverride.hash}` : '') + (rebomOverride.tldOnly ? `&tldOnly=${rebomOverride.tldOnly}` : '') + (rebomOverride.structure.toLowerCase() === HIERARCHICHAL.toLowerCase() ? `&structure=${HIERARCHICHAL}` : '') 
   }
 
-  function rootComponentOverride(bom: any, rebomOverride: RebomOptions): any {
-    // early return if no override
-    if(!rebomOverride)
-      return bom
+  function rootComponentOverride(bomRecord: BomRecord): any {
+    const rebomOverride = bomRecord.meta
+    const bom = bomRecord.bom
+
+    if (!rebomOverride) return bom
     
-    let newBom: any = {}
-    let rootComponentPurl: string = decodeURIComponent(bom.metadata.component["bom-ref"])
+    const newBom: any = {}
+    const rootComponentPurl: string = decodeURIComponent(bom.metadata.component["bom-ref"])
     //generate purl
-    let newPurl = generatePurl(rebomOverride)
+    const newPurl = generatePurl(rebomOverride)
     logger.info(`generated purl: ${newPurl}`)
     newBom.metadata = bom.metadata
     newBom.metadata.component.purl = newPurl
@@ -317,13 +318,15 @@ import { createHash } from 'crypto';
     newBom.metadata.component['version'] = rebomOverride.version
     // newBom.metadata.component['type'] = rebomOverride.belongsTo?.toLowerCase() ?? 'application'
     newBom.metadata.component['group'] = rebomOverride.group
+    newBom.metadata['authors'] = {name: rebomOverride.group}
+    newBom.metadata['supplier'] = {name: rebomOverride.group}
+    newBom.metadata['timestamp'] = (new Date(bomRecord.last_updated_date)).toISOString()
 
     newBom.dependencies = bom.dependencies
-    let rootdepIndex = bom.dependencies.findIndex((dep: any) => {
+    const rootdepIndex = bom.dependencies.findIndex((dep: any) => {
       // logger.info(`processing bom deps | ref : ${dep.ref}`)
       return dep.ref === rootComponentPurl
-    }
-    )
+    })
     if(rootdepIndex > -1)
       newBom.dependencies[rootdepIndex]['ref'] = newPurl
     else
@@ -374,9 +377,7 @@ import { createHash } from 'crypto';
 }
 
   export async function addBom(bomInput: BomInput): Promise<BomRecord> {
-    // preprocessing here
     let bomObj = await processBomObj(bomInput.bomInput.bom)
-    // bomObj = rootComponentOverride(bomObj, bomInput.bomInput.rebomOptions)
 
     let proceed: boolean = await validateBom(bomObj)
     const rebomOptions : RebomOptions = bomInput.bomInput.rebomOptions ?? {}
