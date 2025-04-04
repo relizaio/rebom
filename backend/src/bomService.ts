@@ -348,10 +348,11 @@ function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions
       // logger.info(`processing bom deps | ref : ${dep.ref}`)
       return dep.ref === rootComponentPurl
     })
+    logger.info(`PSDEBUG: rootdepIndex = ${rootdepIndex}`)
     if(rootdepIndex > -1)
       newBom.dependencies[rootdepIndex]['ref'] = newPurl
     else
-      logger.error(`root dependecy not found ! - rootComponentPurl:, ${rootComponentPurl}, \nrebomOverride:  ${rebomOverride}, \nserialNumber: ${bom.serialNumber}`)
+      logger.error(`root dependecy not found ! - rootComponentPurl: ${rootComponentPurl}, \nrebomOverride:  ${rebomOverride}, \nserialNumber: ${bom.serialNumber}`)
     const finalBom = Object.assign(bom, newBom)
 
     const rebomTool = {
