@@ -1,3 +1,4 @@
+import { isSupportedSpdxId } from '@cyclonedx/cyclonedx-library/dist.d/spdx';
 import * as BomRepository from './bomRespository';
 import { logger } from './logger';
 import { fetchFromOci, pushToOci } from './ociService';
@@ -352,6 +353,40 @@ function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions
     else
       logger.error(`root dependecy not found ! - rootComponentPurl:, ${rootComponentPurl}, \nrebomOverride:  ${rebomOverride}, \nserialNumber: ${bom.serialNumber}`)
     const finalBom = Object.assign(bom, newBom)
+
+    const rebomTool = {
+      "type": "application",
+      "name": "rebom",
+      "group": "io.reliza",
+      "version": "0.0.51",
+      "authors": [{
+        name: "Reliza Incorporated",
+        email: "info@reliza.io"
+      }],
+      supplier: {
+        name: "Reliza Incorporated"
+      },
+      "description": "Catalog of SBOMs",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "ssh://git@github.com/relizaio/rebomy.git",
+          "type": "vcs"
+        },
+        {
+          "url": "https://reliza.io",
+          "type": "website"
+        }
+      ]
+    }
+    if (!finalBom.metadata.tools) finalBom.metadata.tools = []
+    finalBom.metadata.tools.push(rebomTool)
     return finalBom
   }
 
