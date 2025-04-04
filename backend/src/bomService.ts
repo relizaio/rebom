@@ -5,9 +5,11 @@ import { BomDto, BomInput, BomRecord, BomSearch, HIERARCHICHAL, RebomOptions, Se
 import validateBom from './validateBom';
 const canonicalize = require ('canonicalize')
 import { createHash } from 'crypto';
-  const utils = require('./utils')
+import { PackageURL } from 'packageurl-js'
 
-  async function bomRecordToDto(bomRecord: BomRecord, rootOverride: boolean = true): Promise<BomDto> {
+const utils = require('./utils')
+
+async function bomRecordToDto(bomRecord: BomRecord, rootOverride: boolean = true): Promise<BomDto> {
     let version = ''
     let group = ''
     let name = ''
@@ -42,19 +44,19 @@ import { createHash } from 'crypto';
     return bomDto
 }
 
-  export async function findAllBoms(): Promise<BomDto[]> {
+export async function findAllBoms(): Promise<BomDto[]> {
     let bomRecords = await BomRepository.findAllBoms();
     return await Promise.all(bomRecords.map(async(b) => bomRecordToDto(b)))
-  }
+}
 
-  export async function findBomObjectById(id: string): Promise<Object> {
+export async function findBomObjectById(id: string): Promise<Object> {
     let bomById = (await BomRepository.bomById(id))[0]
     let bomDto = await bomRecordToDto(bomById)
     // logger.info("writing to file bomrecord")
     // await writeFileAsync("/home/r/work/reliza/rebom/boms/"+id+".byID.json", JSON.stringify(bomById))
     // await writeFileAsync("/home/r/work/reliza/rebom/boms/"+id+".dto.json", JSON.stringify(bomDto))
     return bomDto.bom
-  }
+}
 
   export async function findBom(bomSearch: BomSearch): Promise<BomDto[]> {
     let searchObject = {
@@ -279,7 +281,7 @@ import { createHash } from 'crypto';
 
   function postMergeOps(bomObj: any, rebomOptions: RebomOptions): any {
     // set bom-ref and purl for the root mreged component + we would need somekinda identifiers as well?
-    const purl = generatePurl(rebomOptions)
+    const purl = establishPurl(undefined, rebomOptions)
     // bomObj.serialNumber = `urn:uuid:${rebomOptions.releaseId}`
     bomObj.metadata.component['bom-ref'] = purl
     bomObj.metadata.component['purl'] = purl
@@ -294,11 +296,29 @@ import { createHash } from 'crypto';
 
   }
 
-  function generatePurl(rebomOverride: RebomOptions): string {
-    const group = encodeURIComponent(rebomOverride.group)
-    const name = encodeURIComponent(rebomOverride.name)
-    return `pkg:generic/${group}/${name}@${rebomOverride.version}?tool=rebom` + (rebomOverride.belongsTo ? `&belongsTo=${rebomOverride.belongsTo}` : '') + (rebomOverride.hash ? `&hash=${rebomOverride.hash}` : '') + (rebomOverride.tldOnly ? `&tldOnly=${rebomOverride.tldOnly}` : '') + (rebomOverride.structure.toLowerCase() === HIERARCHICHAL.toLowerCase() ? `&structure=${HIERARCHICHAL}` : '') 
-  }
+function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions): string {
+    let origPurlParsed: PackageURL | undefined = undefined
+    if (origPurl) origPurlParsed = PackageURL.fromString(origPurl)
+    const namespace = (origPurlParsed && origPurlParsed.namespace) ? origPurlParsed.namespace : encodeURIComponent(rebomOverride.group)
+    const name = (origPurlParsed && origPurlParsed.name) ? origPurlParsed.name : encodeURIComponent(rebomOverride.name)
+    const type = (origPurlParsed && origPurlParsed.type) ? origPurlParsed.type : 'generic'
+    const version = rebomOverride.version
+    const qualifiers = (origPurlParsed && origPurlParsed.qualifiers) ? origPurlParsed.qualifiers : {}
+    if (rebomOverride.belongsTo) qualifiers.belongsTo = rebomOverride.belongsTo
+    if (rebomOverride.hash) qualifiers.hash = rebomOverride.hash
+    if (rebomOverride.tldOnly) qualifiers.tldOnly = 'true'
+    if (rebomOverride.structure.toLowerCase() === HIERARCHICHAL.toLowerCase()) qualifiers.structure = HIERARCHICHAL
+    const purl = new PackageURL(
+      type,
+      namespace,
+      name,
+      version,
+      qualifiers,
+      undefined
+    )
+    
+    return purl.toString()
+}
 
   function rootComponentOverride(bomRecord: BomRecord): any {
     const rebomOverride = bomRecord.meta
@@ -308,9 +328,9 @@ import { createHash } from 'crypto';
     
     const newBom: any = {}
     const rootComponentPurl: string = decodeURIComponent(bom.metadata.component["bom-ref"])
-    //generate purl
-    const newPurl = generatePurl(rebomOverride)
-    logger.info(`generated purl: ${newPurl}`)
+    const origPurl = (bom.metadata && bom.metadata.component && bom.metadata.component.purl) ? bom.metadata.component.purl : undefined
+    const newPurl = establishPurl(origPurl, rebomOverride)
+    logger.debug(`established purl: ${newPurl}`)
     newBom.metadata = bom.metadata
     newBom.metadata.component.purl = newPurl
     newBom.metadata.component['bom-ref'] = newPurl
