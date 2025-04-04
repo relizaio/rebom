@@ -358,6 +358,7 @@ function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions
       "type": "application",
       "name": "rebom",
       "group": "io.reliza",
+      version: process.env.npm_package_version,
       "authors": [{
         name: "Reliza Incorporated",
         email: "info@reliza.io"
