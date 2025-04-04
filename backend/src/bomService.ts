@@ -351,8 +351,11 @@ function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions
     logger.info(`PSDEBUG: rootdepIndex = ${rootdepIndex}`)
     if(rootdepIndex > -1)
       newBom.dependencies[rootdepIndex]['ref'] = newPurl
-    else
+    else {
       logger.error(`root dependecy not found ! - rootComponentPurl: ${rootComponentPurl}, \nrebomOverride:  ${rebomOverride}, \nserialNumber: ${bom.serialNumber}`)
+      logger.info(newBom.dependencies[0].toString())
+    }
+      
     const finalBom = Object.assign(bom, newBom)
 
     const rebomTool: any = {
@@ -408,7 +411,7 @@ function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions
       const rootComponentPurl: string = bom.metadata.component["bom-ref"]
       const versionStrippedRootComponentPurl = rootComponentPurl.split("@")[0]
 
-      let rootdepIndex = bomForDigest["dependencies"].findIndex((dep: any) => {
+      const rootdepIndex = bomForDigest["dependencies"].findIndex((dep: any) => {
         return dep.ref === rootComponentPurl
       }
       )
