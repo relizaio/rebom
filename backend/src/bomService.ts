@@ -339,7 +339,7 @@ function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions
     newBom.metadata.component['version'] = rebomOverride.version
     // newBom.metadata.component['type'] = rebomOverride.belongsTo?.toLowerCase() ?? 'application'
     newBom.metadata.component['group'] = rebomOverride.group
-    newBom.metadata['authors'] = {name: rebomOverride.group}
+    newBom.metadata['authors'] = [{name: rebomOverride.group}]
     newBom.metadata['supplier'] = {name: rebomOverride.group}
     newBom.metadata['timestamp'] = (new Date(bomRecord.last_updated_date)).toISOString()
 
