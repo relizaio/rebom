@@ -355,15 +355,11 @@ function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions
       logger.error(`root dependecy not found ! - rootComponentPurl: ${rootComponentPurl}, \nrebomOverride:  ${rebomOverride}, \nserialNumber: ${bom.serialNumber}`)
     const finalBom = Object.assign(bom, newBom)
 
-    const rebomTool = {
+    const rebomTool: any = {
       "type": "application",
       "name": "rebom",
       "group": "io.reliza",
       version: process.env.npm_package_version,
-      "authors": [{
-        name: "Reliza Incorporated",
-        email: "info@reliza.io"
-      }],
       supplier: {
         name: "Reliza Incorporated"
       },
@@ -385,6 +381,14 @@ function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions
           "type": "website"
         }
       ]
+    }
+    if (finalBom.specVersion === '1.6' ) {
+        rebomTool["authors"] = [{
+            name: "Reliza Incorporated",
+            email: "info@reliza.io"
+        }]
+    } else {
+      rebomTool["author"] = "Reliza Incorporated"
     }
     if (!finalBom.metadata.tools) finalBom.metadata.tools = {components: []}
     if (!finalBom.metadata.tools.components) finalBom.metadata.tools.components = []
