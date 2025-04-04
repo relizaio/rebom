@@ -358,7 +358,6 @@ function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions
       "type": "application",
       "name": "rebom",
       "group": "io.reliza",
-      "version": "0.0.51",
       "authors": [{
         name: "Reliza Incorporated",
         email: "info@reliza.io"
@@ -385,8 +384,9 @@ function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions
         }
       ]
     }
-    if (!finalBom.metadata.tools) finalBom.metadata.tools = []
-    finalBom.metadata.tools.push(rebomTool)
+    if (!finalBom.metadata.tools) finalBom.metadata.tools = {components: []}
+    if (!finalBom.metadata.tools.components) finalBom.metadata.tools.components = []
+    finalBom.metadata.tools.components.push(rebomTool)
     return finalBom
   }
 
