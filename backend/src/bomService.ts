@@ -328,7 +328,7 @@ function rootComponentOverride(bomRecord: BomRecord): any {
     if (!rebomOverride) return bom
     
     const newBom: any = {}
-    const rootComponentPurl: string = decodeURIComponent(bom.metadata.component["bom-ref"])
+    const rootdepIndex = computeRootDepIndex(bom)
     const origPurl = (bom.metadata && bom.metadata.component && bom.metadata.component.purl) ? bom.metadata.component.purl : undefined
     const newPurl = establishPurl(origPurl, rebomOverride)
     logger.debug(`established purl: ${newPurl}`)
@@ -344,7 +344,7 @@ function rootComponentOverride(bomRecord: BomRecord): any {
     newBom.metadata['timestamp'] = (new Date(bomRecord.last_updated_date)).toISOString()
 
     newBom.dependencies = bom.dependencies
-    const rootdepIndex = computeRootDepIndex(bom)
+  
     if(rootdepIndex > -1) newBom.dependencies[rootdepIndex]['ref'] = newPurl
   
     const finalBom = Object.assign(bom, newBom)
@@ -391,7 +391,7 @@ function rootComponentOverride(bomRecord: BomRecord): any {
 }
 
 function computeRootDepIndex (bom: any) : number {
-    const rootComponentPurl: string = bom.metadata.component["bom-ref"]
+    const rootComponentPurl: string = decodeURIComponent(bom.metadata.component["bom-ref"])
     let rootdepIndex : number = bom.dependencies.findIndex((dep: any) => {
         return dep.ref === rootComponentPurl
     })
