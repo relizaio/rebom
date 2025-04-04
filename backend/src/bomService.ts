@@ -376,7 +376,7 @@ function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions
       ],
       "externalReferences": [
         {
-          "url": "ssh://git@github.com/relizaio/rebomy.git",
+          "url": "ssh://git@github.com/relizaio/rebom.git",
           "type": "vcs"
         },
         {
