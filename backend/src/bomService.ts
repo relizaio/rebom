@@ -321,7 +321,7 @@ function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions
     return purl.toString()
 }
 
-  function rootComponentOverride(bomRecord: BomRecord): any {
+function rootComponentOverride(bomRecord: BomRecord): any {
     const rebomOverride = bomRecord.meta
     const bom = bomRecord.bom
 
@@ -344,18 +344,9 @@ function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions
     newBom.metadata['timestamp'] = (new Date(bomRecord.last_updated_date)).toISOString()
 
     newBom.dependencies = bom.dependencies
-    const rootdepIndex = bom.dependencies.findIndex((dep: any) => {
-      // logger.info(`processing bom deps | ref : ${dep.ref}`)
-      return dep.ref === rootComponentPurl
-    })
-    logger.info(`PSDEBUG: rootdepIndex = ${rootdepIndex}`)
-    if(rootdepIndex > -1)
-      newBom.dependencies[rootdepIndex]['ref'] = newPurl
-    else {
-      logger.error(`root dependecy not found ! - rootComponentPurl: ${rootComponentPurl}, \nrebomOverride:  ${rebomOverride}, \nserialNumber: ${bom.serialNumber}`)
-      logger.info(JSON.stringify(newBom.dependencies))
-    }
-      
+    const rootdepIndex = computeRootDepIndex(bom)
+    if(rootdepIndex > -1) newBom.dependencies[rootdepIndex]['ref'] = newPurl
+  
     const finalBom = Object.assign(bom, newBom)
 
     const rebomTool: any = {
@@ -397,7 +388,25 @@ function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions
     if (!finalBom.metadata.tools.components) finalBom.metadata.tools.components = []
     finalBom.metadata.tools.components.push(rebomTool)
     return finalBom
-  }
+}
+
+function computeRootDepIndex (bom: any) : number {
+    const rootComponentPurl: string = bom.metadata.component["bom-ref"]
+    let rootdepIndex : number = bom.dependencies.findIndex((dep: any) => {
+        return dep.ref === rootComponentPurl
+    })
+    if (rootdepIndex < 0) {
+        const versionStrippedRootComponentPurl = rootComponentPurl.split("@")[0]
+        rootdepIndex = bom.dependencies.findIndex((dep: any) => {
+            return dep.ref === versionStrippedRootComponentPurl
+        })
+    }
+    if (rootdepIndex < 0) {
+        logger.error(`root dependecy not found ! - rootComponentPurl: ${rootComponentPurl}, \nserialNumber: ${bom.serialNumber}`)
+        logger.debug(JSON.stringify(bom.dependencies))
+    }
+    return rootdepIndex
+}
 
   // function computeSha
   function computeBomDigest(bom: any, stripBom: string): string {
@@ -410,15 +419,13 @@ function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions
       //strip version
       const rootComponentPurl: string = bom.metadata.component["bom-ref"]
       const versionStrippedRootComponentPurl = rootComponentPurl.split("@")[0]
+      
+      const rootdepIndex = computeRootDepIndex(bom)
 
-      const rootdepIndex = bomForDigest["dependencies"].findIndex((dep: any) => {
-        return dep.ref === rootComponentPurl
-      }
-      )
       if(rootdepIndex > -1){
         bomForDigest["dependencies"][rootdepIndex]['ref'] = versionStrippedRootComponentPurl
       }
-    }else{
+    } else {
       bomForDigest = bom
     }
    
