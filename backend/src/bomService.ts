@@ -58,6 +58,11 @@ export async function findBomObjectById(id: string): Promise<Object> {
     // await writeFileAsync("/home/r/work/reliza/rebom/boms/"+id+".dto.json", JSON.stringify(bomDto))
     return bomDto.bom
 }
+export async function findRawBomObjectById(id: string): Promise<Object> {
+    let bomById = (await BomRepository.bomById(id))[0]
+    const rawBom = await fetchFromOci(bomById.meta.serialNumber)
+    return rawBom
+}
 
   export async function findBom(bomSearch: BomSearch): Promise<BomDto[]> {
     let searchObject = {

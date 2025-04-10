@@ -7,6 +7,7 @@ const resolvers = {
 		allBoms: async (): Promise<BomDto[]> => BomService.findAllBoms(),
 		findBom: async (_:any, bomSearch: BomSearch): Promise<BomDto[]> => BomService.findBom(bomSearch),
 		bomById: async (_:any, id: any): Promise<Object> => BomService.findBomObjectById(id.id),
+		rawBomId: async (_:any, id: any): Promise<Object> => BomService.findRawBomObjectById(id.id),
 		mergeBoms: async (_:any, mergeInput: any): Promise<any> => {
 			return BomService.exportMergedBom(mergeInput.ids, mergeInput.rebomOptions)},
 		

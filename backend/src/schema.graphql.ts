@@ -8,6 +8,7 @@ const typeDefs = gql`
     allBoms: [Bom]
     findBom(bomSearch: BomSearch): [Bom]
     bomById(id: ID): Object
+    rawBomId(id: ID): Object
     mergeBoms(ids: [ID]!, rebomOptions: RebomOptions!): Object
   }
 
