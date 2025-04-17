@@ -7,6 +7,7 @@ import validateBom from './validateBom';
 const canonicalize = require ('canonicalize')
 import { createHash } from 'crypto';
 import { PackageURL } from 'packageurl-js'
+import { v4 as uuidv4 } from 'uuid';
 
 const utils = require('./utils')
 
@@ -16,7 +17,7 @@ async function bomRecordToDto(bomRecord: BomRecord, rootOverride: boolean = true
     let name = ''
     let bomVersion = ''
     if(process.env.OCI_STORAGE_ENABLED){
-      bomRecord.bom = await fetchFromOci(bomRecord.meta.serialNumber)
+      bomRecord.bom = await fetchFromOci(bomRecord.uuid)
     }
     
     if(rootOverride)
@@ -51,18 +52,20 @@ export async function findAllBoms(): Promise<BomDto[]> {
 }
 
 export async function findBomObjectById(id: string): Promise<Object> {
-    let bomById = (await BomRepository.bomById(id))[0]
-    let bomDto = await bomRecordToDto(bomById)
+  let bomById = (await BomRepository.bomBySerialNumber(id))[0]
+  let bomDto = await bomRecordToDto(bomById)
     // logger.info("writing to file bomrecord")
     // await writeFileAsync("/home/r/work/reliza/rebom/boms/"+id+".byID.json", JSON.stringify(bomById))
     // await writeFileAsync("/home/r/work/reliza/rebom/boms/"+id+".dto.json", JSON.stringify(bomDto))
     return bomDto.bom
 }
+
 export async function findRawBomObjectById(id: string): Promise<Object> {
-    let bomById = (await BomRepository.bomById(id))[0]
-    const rawBom = await fetchFromOci(bomById.meta.serialNumber)
-    return rawBom
-}
+  let bomById = (await BomRepository.bomBySerialNumber(id))[0]
+
+    return await fetchFromOci(bomById.uuid)
+  }
+
 
   export async function findBom(bomSearch: BomSearch): Promise<BomDto[]> {
     let searchObject = {
@@ -460,13 +463,15 @@ function computeRootDepIndex (bom: any) : number {
     rebomOptions.serialNumber = bomObj.serialNumber
     const bomSha: string = computeBomDigest(bomObj, rebomOptions.stripBom)
     rebomOptions.bomDigest = bomSha
+    rebomOptions.bomVersion = bomObj.version
+    const newUuid = uuidv4(); 
     // find bom by digest
     let bomRows: BomRecord[]
     let bomRecord: BomRecord
     bomRows = await BomRepository.bomByDigest(bomSha)
     if (!bomRows || !bomRows.length){
       if(process.env.OCI_STORAGE_ENABLED){
-        bomObj = await pushToOci(rebomOptions.serialNumber, bomObj)
+        bomObj = await pushToOci(newUuid, bomObj)
         rebomOptions.storage = 'oci'
       }
   
@@ -474,8 +479,8 @@ function computeRootDepIndex (bom: any) : number {
       // urn must be unique - if same urn is supplied, we update current record
       // similarly it works for version, component group, component name, component version
       // check if urn is set on bom
-      let queryText = 'INSERT INTO rebom.boms (meta, bom, tags) VALUES ($1, $2, $3) RETURNING *'
-      let queryParams = [rebomOptions, bomObj, bomInput.bomInput.tags]
+      let queryText = 'INSERT INTO rebom.boms (uuid, meta, bom, tags) VALUES ($1, $2, $3, $4) RETURNING *'
+      let queryParams = [newUuid, rebomOptions, bomObj, bomInput.bomInput.tags]
       if (rebomOptions.serialNumber) {
         let bomSearch: BomSearch = {
           bomSearch: {

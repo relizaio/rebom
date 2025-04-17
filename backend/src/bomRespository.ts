@@ -13,6 +13,16 @@ export async function bomById(id: string): Promise<BomRecord[]> {
     return boms
 }
 
+export async function bomBySerialNumber(serialNumber: string): Promise<BomRecord[]> {
+    if (!serialNumber.startsWith('urn')) {
+        serialNumber = 'urn:uuid:' + serialNumber
+    }
+    let byIdRows = await utils.runQuery(`select * from rebom.boms where meta->>'serialNumber' = $1 ORDER BY (meta->>'bomVersion')::numeric DESC
+LIMIT 1;`, [serialNumber])
+    let boms = byIdRows.rows as BomRecord[]
+    return boms
+}
+
 export async function bomsByIds(ids: string[]): Promise<BomRecord[]> {
     let queryRes = await utils.runQuery(`select * from rebom.boms where uuid::text in ('` + ids.join('\',\'') + `')`)
     let boms = queryRes.rows as BomRecord[]

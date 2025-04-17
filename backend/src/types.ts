@@ -7,7 +7,7 @@ export type BomRecord = {
     tags: Object,
     organization: string,
     public: boolean,
-    duplicate: boolean,
+    duplicate: boolean
 }
 
 export type BomDto = {
@@ -47,8 +47,8 @@ export type RebomOptions = {
     mod: string, //[raw, rebom, user?]
     storage: string, //[oci, db]
     bomDigest?: string,
-    stripBom: string
-
+    stripBom: string,
+    bomVersion: string
 }
 
 export type BomSearch = {

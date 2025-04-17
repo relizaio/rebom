@@ -53,6 +53,7 @@ const typeDefs = gql`
     structure: String
     notes: String
     stripBom: String
+    serialNumber: String
   }
 
   input RebomOverride {

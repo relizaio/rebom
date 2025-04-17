@@ -13,6 +13,9 @@ export async function fetchFromOci(tag: string): Promise<Object>{
     if(tag.startsWith("urn")){
         tag = tag.replace("urn:uuid:","")
     }
+    if(!tag.startsWith('rebom')){
+        tag = 'rebom' + tag
+    }
     const resp: AxiosResponse = await client.get('/pull', { 
         params: {
             registry: registryHost,
@@ -38,6 +41,9 @@ interface OciResponse {
 export async function pushToOci(tag: string, bom: any): Promise<OciResponse>{
     if(tag.startsWith("urn")){
         tag = tag.replace("urn:uuid:","")
+    }
+    if(!tag.startsWith('rebom')){
+        tag = 'rebom' + tag
     }
     let resp: OciResponse = {}
     const formData = new FormData();
