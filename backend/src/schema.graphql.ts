@@ -7,14 +7,13 @@ const typeDefs = gql`
     dbtest: String
     allBoms: [Bom]
     findBom(bomSearch: BomSearch): [Bom]
-    bomById(id: ID): Object
-    rawBomId(id: ID): Object
-    mergeBoms(ids: [ID]!, rebomOptions: RebomOptions!): Object
+    bomById(id: ID, org: ID): Object
+    rawBomId(id: ID, org: ID): Object
   }
 
   type Mutation {
     addBom(bomInput: BomInput!): Bom
-    mergeAndStoreBoms(ids: [ID]!, rebomOptions: RebomOptions!): Bom
+    mergeAndStoreBoms(ids: [ID]!, rebomOptions: RebomOptions!, org: ID): Bom
   }
 
   type Bom {
@@ -37,6 +36,7 @@ const typeDefs = gql`
     meta: String
     bom: Object
     tags: Object
+    org: ID
     rebomOptions: RebomOptions
   }
 

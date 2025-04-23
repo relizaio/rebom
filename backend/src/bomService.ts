@@ -51,8 +51,9 @@ export async function findAllBoms(): Promise<BomDto[]> {
     return await Promise.all(bomRecords.map(async(b) => bomRecordToDto(b)))
 }
 
-export async function findBomObjectById(id: string): Promise<Object> {
-  let bomById = (await BomRepository.bomBySerialNumber(id))[0]
+export async function findBomObjectById(id: string, org: string): Promise<Object> {
+
+  let bomById = (await BomRepository.bomBySerialNumber(id, org))[0]
   let bomDto = await bomRecordToDto(bomById)
     // logger.info("writing to file bomrecord")
     // await writeFileAsync("/home/r/work/reliza/rebom/boms/"+id+".byID.json", JSON.stringify(bomById))
@@ -60,8 +61,8 @@ export async function findBomObjectById(id: string): Promise<Object> {
     return bomDto.bom
 }
 
-export async function findRawBomObjectById(id: string): Promise<Object> {
-  let bomById = (await BomRepository.bomBySerialNumber(id))[0]
+export async function findRawBomObjectById(id: string, org: string): Promise<Object> {
+  let bomById = (await BomRepository.bomBySerialNumber(id, org))[0]
 
     return await fetchFromOci(bomById.uuid)
   }
@@ -157,14 +158,14 @@ export async function findRawBomObjectById(id: string): Promise<Object> {
     ++searchObject.paramId
   }
 
-  export async function exportMergedBom(ids: string[], rebomOptions: RebomOptions): Promise<any> {
-    return JSON.stringify(mergeBoms(ids, rebomOptions))
-  }
+  // export async function exportMergedBom(ids: string[], rebomOptions: RebomOptions): Promise<any> {
+  //   return JSON.stringify(mergeBoms(ids, rebomOptions))
+  // }
 
-  export async function mergeBoms(ids: string[], rebomOptions: RebomOptions): Promise<any> {
+  export async function mergeBoms(ids: string[], rebomOptions: RebomOptions, org: string): Promise<any> {
     try {
       let mergedBom = null
-      const bomObjs = await findBomsForMerge(ids, rebomOptions.tldOnly)
+      const bomObjs = await findBomsForMerge(ids, rebomOptions.tldOnly, org)
       if (bomObjs && bomObjs.length)
         mergedBom = await mergeBomObjects(bomObjs, rebomOptions)
       return mergedBom
@@ -174,13 +175,14 @@ export async function findRawBomObjectById(id: string): Promise<Object> {
     }
   }
 
-  export async function mergeAndStoreBoms(ids: string[], rebomOptions: RebomOptions): Promise<any> {
+  export async function mergeAndStoreBoms(ids: string[], rebomOptions: RebomOptions, org: string): Promise<BomRecord> {
     try {
-      const mergedBom = await mergeBoms(ids, rebomOptions)
+      const mergedBom = await mergeBoms(ids, rebomOptions, org)
       const bomInput : BomInput = {
         bomInput: {
           rebomOptions: rebomOptions,
           bom: mergedBom,
+          org: org
         }
       }
       const bomRecord = await addBom(bomInput)
@@ -191,9 +193,9 @@ export async function findRawBomObjectById(id: string): Promise<Object> {
     }
   }
 
-  async function findBomsForMerge(ids: string[], tldOnly: boolean) {
+  async function findBomsForMerge(ids: string[], tldOnly: boolean, org: string) {
     logger.info(`findBomsForMerge: ${ids}`)
-    let bomRecords =  await Promise.all(ids.map(async(id) => findBomObjectById(id)))
+    let bomRecords =  await Promise.all(ids.map(async(id) => findBomObjectById(id, org)))
     let bomObjs: any[] = []
     logger.info(`bomrecords found # ${bomRecords.length}`)
     if (bomRecords && bomRecords.length) {
@@ -468,7 +470,7 @@ function computeRootDepIndex (bom: any) : number {
     // find bom by digest
     let bomRows: BomRecord[]
     let bomRecord: BomRecord
-    bomRows = await BomRepository.bomByDigest(bomSha)
+    bomRows = await BomRepository.bomByOrgAndDigest(bomSha, bomInput.bomInput.org)
     if (!bomRows || !bomRows.length){
       if(process.env.OCI_STORAGE_ENABLED){
         bomObj = await pushToOci(newUuid, bomObj)
@@ -479,8 +481,8 @@ function computeRootDepIndex (bom: any) : number {
       // urn must be unique - if same urn is supplied, we update current record
       // similarly it works for version, component group, component name, component version
       // check if urn is set on bom
-      let queryText = 'INSERT INTO rebom.boms (uuid, meta, bom, tags) VALUES ($1, $2, $3, $4) RETURNING *'
-      let queryParams = [newUuid, rebomOptions, bomObj, bomInput.bomInput.tags]
+      let queryText = 'INSERT INTO rebom.boms (uuid, meta, bom, tags, organization) VALUES ($1, $2, $3, $4, $5) RETURNING *'
+      let queryParams = [newUuid, rebomOptions, bomObj, bomInput.bomInput.tags, bomInput.bomInput.org]
       if (rebomOptions.serialNumber) {
         let bomSearch: BomSearch = {
           bomSearch: {

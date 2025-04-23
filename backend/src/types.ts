@@ -29,7 +29,8 @@ export type BomInput = {
     bomInput: {
         bom: any,
         tags?: Object,
-        rebomOptions: RebomOptions
+        rebomOptions: RebomOptions,
+        org: string,
     }
 }
 
