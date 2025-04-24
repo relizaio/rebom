@@ -310,9 +310,10 @@ export async function findRawBomObjectById(id: string, org: string): Promise<Obj
 function establishPurl(origPurl: string | undefined, rebomOverride: RebomOptions): string {
     let origPurlParsed: PackageURL | undefined = undefined
     if (origPurl) origPurlParsed = PackageURL.fromString(origPurl)
-    const namespace = (origPurlParsed && origPurlParsed.namespace) ? origPurlParsed.namespace : encodeURIComponent(rebomOverride.group)
-    const name = (origPurlParsed && origPurlParsed.name) ? origPurlParsed.name : encodeURIComponent(rebomOverride.name)
     const type = (origPurlParsed && origPurlParsed.type) ? origPurlParsed.type : 'generic'
+    const namespace = (origPurlParsed && (origPurlParsed.namespace || type === 'oci')) ? origPurlParsed.namespace : encodeURIComponent(rebomOverride.group)
+    const name = (origPurlParsed && origPurlParsed.name) ? origPurlParsed.name : encodeURIComponent(rebomOverride.name)
+
     const version = rebomOverride.version
     const qualifiers = (origPurlParsed && origPurlParsed.qualifiers) ? origPurlParsed.qualifiers : {}
     if (rebomOverride.belongsTo) qualifiers.belongsTo = rebomOverride.belongsTo
