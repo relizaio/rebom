@@ -2,7 +2,7 @@ import { isSupportedSpdxId } from '@cyclonedx/cyclonedx-library/dist.d/spdx';
 import * as BomRepository from './bomRespository';
 import { logger } from './logger';
 import { fetchFromOci, pushToOci } from './ociService';
-import { BomDto, BomInput, BomRecord, BomSearch, HIERARCHICHAL, RebomOptions, SearchObject } from './types';
+import { BomDto, BomMetaDto, BomInput, BomRecord, BomSearch, HIERARCHICHAL, RebomOptions, SearchObject } from './types';
 import validateBom from './validateBom';
 const canonicalize = require ('canonicalize')
 import { createHash } from 'crypto';
@@ -46,19 +46,49 @@ async function bomRecordToDto(bomRecord: BomRecord, rootOverride: boolean = true
     return bomDto
 }
 
+async function bomRecordToBomMetaDto(bomRecord: BomRecord): Promise<BomMetaDto> {
+  const bomMetaDto : BomMetaDto = {
+    name: bomRecord.meta.name,
+    group: bomRecord.meta.group,
+    bomVersion: bomRecord.meta.bomVersion,
+    hash: bomRecord.meta.hash,
+    belongsTo: bomRecord.meta.belongsTo,
+    tldOnly: bomRecord.meta.tldOnly,
+    structure: bomRecord.meta.structure,
+    notes: bomRecord.meta.notes,
+    stripBom: bomRecord.meta.stripBom,
+    serialNumber: bomRecord.meta.serialNumber
+  }
+  return bomMetaDto
+}
+
 export async function findAllBoms(): Promise<BomDto[]> {
     let bomRecords = await BomRepository.findAllBoms();
     return await Promise.all(bomRecords.map(async(b) => bomRecordToDto(b)))
 }
 
+// TODO switch this one back to use UUID instead of serial number
 export async function findBomObjectById(id: string, org: string): Promise<Object> {
 
-  let bomById = (await BomRepository.bomBySerialNumber(id, org))[0]
-  let bomDto = await bomRecordToDto(bomById)
+  const bomById = (await BomRepository.bomBySerialNumber(id, org))[0]
+  const bomDto = await bomRecordToDto(bomById)
     // logger.info("writing to file bomrecord")
     // await writeFileAsync("/home/r/work/reliza/rebom/boms/"+id+".byID.json", JSON.stringify(bomById))
     // await writeFileAsync("/home/r/work/reliza/rebom/boms/"+id+".dto.json", JSON.stringify(bomDto))
-    return bomDto.bom
+  return bomDto.bom
+}
+
+export async function findBomMetasBySerialNumber(serialNumber: string, org: string): Promise<BomMetaDto[]> {
+  const bomsBySerialNumber = await BomRepository.bomBySerialNumber(serialNumber, org)
+  const bomMetaPromises = bomsBySerialNumber.map((x: BomRecord) => bomRecordToBomMetaDto(x))
+  return await Promise.all(bomMetaPromises)
+}
+
+export async function findBomBySerialNumberAndVersion(serialNumber: string, version: number, org: string, raw?: boolean): Promise<Object> {
+  const bomsBySerialNumber = await BomRepository.bomBySerialNumber(serialNumber, org)
+  const versionedBom = bomsBySerialNumber.filter((b: BomRecord) => b.meta.bomVersion === version.toString())[0]
+  const bomDto = await bomRecordToDto(versionedBom)
+  return bomDto.bom
 }
 
 export async function findRawBomObjectById(id: string, org: string): Promise<Object> {

@@ -8,6 +8,8 @@ const resolvers = {
 		findBom: async (_:any, bomSearch: BomSearch): Promise<BomDto[]> => BomService.findBom(bomSearch),
 		bomById: async (_:any, input: any): Promise<Object> => BomService.findBomObjectById(input.id, input.org),
 		rawBomId: async (_:any, input: any): Promise<Object> => BomService.findRawBomObjectById(input.id, input.org),
+		bomBySerialNumberAndVersion: async (_:any, input: any): Promise<Object> => BomService.findBomBySerialNumberAndVersion(input.serialNumber, input.version, input.org, input.raw),
+		bomMetaBySerialNumber: async (_:any, input: any): Promise<Object> => BomService.findBomMetasBySerialNumber(input.serialNumber, input.org),
 		// mergeBoms: async (_:any, mergeInput: any): Promise<any> => {
 		// 	return BomService.exportMergedBom(mergeInput.ids, mergeInput.rebomOptions)},
 		

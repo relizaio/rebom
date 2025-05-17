@@ -25,6 +25,19 @@ export type BomDto = {
     version: string
 }
 
+export type BomMetaDto = {
+    name: string,
+    group: string,
+    bomVersion: string,
+    hash: string | undefined,
+    belongsTo: string,
+    tldOnly: boolean,
+    structure: string,
+    notes: string,
+    stripBom: string,
+    serialNumber: string
+}
+
 export type BomInput = {
     bomInput: {
         bom: any,

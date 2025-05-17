@@ -9,6 +9,8 @@ const typeDefs = gql`
     findBom(bomSearch: BomSearch): [Bom]
     bomById(id: ID, org: ID): Object
     rawBomId(id: ID, org: ID): Object
+    bomBySerialNumberAndVersion(serialNumber: ID!, version: Int!, org: ID!, raw: Boolean): Object
+    bomMetaBySerialNumber(serialNumber: ID!, org: ID!): [BomMeta]
   }
 
   type Mutation {
@@ -32,6 +34,19 @@ const typeDefs = gql`
     duplicate: Boolean
   }
 
+  type BomMeta {
+    name: String
+    group: String
+    bomVersion: String
+    hash: String
+    belongsTo: String
+    tldOnly: Boolean
+    structure: String
+    notes: String
+    stripBom: String
+    serialNumber: ID
+  }
+
   input BomInput {
     meta: String
     bom: Object
@@ -53,7 +68,7 @@ const typeDefs = gql`
     structure: String
     notes: String
     stripBom: String
-    serialNumber: String
+    serialNumber: ID
   }
 
   input RebomOverride {
