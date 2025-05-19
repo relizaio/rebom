@@ -1,4 +1,4 @@
-on: [push]
+# on: [push]
 
 name: Build Docker Image And Submit Metadata To Reliza Hub
 
