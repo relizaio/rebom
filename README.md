@@ -1,4 +1,8 @@
-# Rebom by Reliza
+# N.B. Rebom Project is Moved under [ReARM](https://github.com/relizaio/rearm)
+
+This repository will be preserved for the purposes of tutorials built on top of that but is not maintained since 2025-05-20.
+
+## Rebom by Reliza
 
 ## Catalog of Software Bills of Materials (SBOMs)
 
